@@ -22,25 +22,28 @@ def fmt(x, pos):
 
 
 
-f = h5py.File('data_full.h5', 'r')
+f = h5py.File('data_full_beta_withprefac.h5', 'r')
 wn_arr      = f['wn_array']
 q_arr       = f['q_array']
 shear_arr   = f['shear_array']
-alpha_arr   = f['alpha_array']
+beta_arr    = f['beta_array']
 eta_arr     = f['eta_array']
 AE_err_arr  = f['AE_error_array']
 AE_arr      = f['AE_array']
 
-cmapstring='plasma'
 
+# wn_idx = 3
+
+
+
+cmapstring='plasma'
+v       = np.linspace(0, 1.0, 100, endpoint=True)
+v_ticks = np.linspace(0, 1.0, 6, endpoint=True)
+v_label = [r'$0.0$',r'$0.2$',r'$0.4$',r'$0.6$',r'$0.8$',r'$1.0$']
 
 
 q_idx   = np.array([0,1,2,3])
 eta_idx = np.array([0,1,2,3])
-
-v       = np.linspace(0, 1.0, 100, endpoint=True)
-v_ticks = np.linspace(0, 1.0, 6, endpoint=True)
-v_label = [r'$0.0$',r'$0.2$',r'$0.4$',r'$0.6$',r'$0.8$',r'$1.0$']
 
 
 
@@ -51,23 +54,24 @@ for idx, val in np.ndenumerate(q_arr):
     q_p   = q_arr[idx]
     eta_p = eta_arr[idx]
 
+
     fig, axs = plt.subplots(2, 2, figsize=(4.72440945, 4.0*0.7))
-    c1 =axs[0,0].contourf(shear_arr[0,q_p,:,:,eta_p],alpha_arr[0,q_p,:,:,eta_p],AE_arr[0,q_p,:,:,eta_p]/np.amax(AE_arr[0,q_p,:,:,eta_p]),v,cmap=cmapstring)
-    c2 =axs[0,1].contourf(shear_arr[1,q_p,:,:,eta_p],alpha_arr[1,q_p,:,:,eta_p],AE_arr[1,q_p,:,:,eta_p]/np.amax(AE_arr[1,q_p,:,:,eta_p]),v,cmap=cmapstring)
-    c3 =axs[1,0].contourf(shear_arr[2,q_p,:,:,eta_p],alpha_arr[2,q_p,:,:,eta_p],AE_arr[2,q_p,:,:,eta_p]/np.amax(AE_arr[2,q_p,:,:,eta_p]),v,cmap=cmapstring)
-    c4 =axs[1,1].contourf(shear_arr[3,q_p,:,:,eta_p],alpha_arr[3,q_p,:,:,eta_p],AE_arr[3,q_p,:,:,eta_p]/np.amax(AE_arr[3,q_p,:,:,eta_p]),v,cmap=cmapstring)
-    axs[0,0].text(-3.6, 0.3, '(a)', color='1.0')
-    axs[0,1].text(-3.6, 0.3, '(b)', color='1.0')
-    axs[1,0].text(-3.6, 0.3, '(c)', color='1.0')
-    axs[1,1].text(-3.6, 0.3, '(d)', color='1.0')
-    axs[0,0].text(-3.4, 1.65, r'${}$'.format(fmt(np.amax(AE_arr[0,q_p,:,:,eta_p]),2)), color='1.0')
-    axs[0,1].text(-3.4, 1.65, r'${}$'.format(fmt(np.amax(AE_arr[1,q_p,:,:,eta_p]),2)), color='1.0')
-    axs[1,0].text(-3.4, 1.65, r'${}$'.format(fmt(np.amax(AE_arr[2,q_p,:,:,eta_p]),2)), color='1.0')
-    axs[1,1].text(-3.4, 1.65, r'${}$'.format(fmt(np.amax(AE_arr[3,q_p,:,:,eta_p]),2)), color='1.0')
-    axs[0,0].set_yticks([0,1,2])
-    axs[0,1].set_yticks([0,1,2])
-    axs[1,0].set_yticks([0,1,2])
-    axs[1,1].set_yticks([0,1,2])
+    c1 =axs[0,0].contourf(shear_arr[0,q_p,:,:,eta_p],beta_arr[0,q_p,:,:,eta_p],AE_arr[0,q_p,:,:,eta_p]/np.amax(AE_arr[0,q_p,:,:,eta_p]),v,cmap=cmapstring)
+    c2 =axs[0,1].contourf(shear_arr[1,q_p,:,:,eta_p],beta_arr[1,q_p,:,:,eta_p],AE_arr[1,q_p,:,:,eta_p]/np.amax(AE_arr[1,q_p,:,:,eta_p]),v,cmap=cmapstring)
+    c3 =axs[1,0].contourf(shear_arr[2,q_p,:,:,eta_p],beta_arr[2,q_p,:,:,eta_p],AE_arr[2,q_p,:,:,eta_p]/np.amax(AE_arr[2,q_p,:,:,eta_p]),v,cmap=cmapstring)
+    c4 =axs[1,1].contourf(shear_arr[3,q_p,:,:,eta_p],beta_arr[3,q_p,:,:,eta_p],AE_arr[3,q_p,:,:,eta_p]/np.amax(AE_arr[3,q_p,:,:,eta_p]),v,cmap=cmapstring)
+    axs[0,0].text(-3.6, 0.3*0.5, '(a)', color='1.0')
+    axs[0,1].text(-3.6, 0.3*0.5, '(b)', color='1.0')
+    axs[1,0].text(-3.6, 0.3*0.5, '(c)', color='1.0')
+    axs[1,1].text(-3.6, 0.3*0.5, '(d)', color='1.0')
+    axs[0,0].text(-3.4, 1.65*0.5, r'${}$'.format(fmt(np.amax(AE_arr[0,q_p,:,:,eta_p]),2)), color='1.0')
+    axs[0,1].text(-3.4, 1.65*0.5, r'${}$'.format(fmt(np.amax(AE_arr[1,q_p,:,:,eta_p]),2)), color='1.0')
+    axs[1,0].text(-3.4, 1.65*0.5, r'${}$'.format(fmt(np.amax(AE_arr[2,q_p,:,:,eta_p]),2)), color='1.0')
+    axs[1,1].text(-3.4, 1.65*0.5, r'${}$'.format(fmt(np.amax(AE_arr[3,q_p,:,:,eta_p]),2)), color='1.0')
+    axs[0,0].set_yticks([0,1])
+    axs[0,1].set_yticks([0,1])
+    axs[1,0].set_yticks([0,1])
+    axs[1,1].set_yticks([0,1])
     axs[0,0].set_xticks([-4,0,4])
     axs[0,1].set_xticks([-4,0,4])
     axs[1,0].set_xticks([-4,0,4])
@@ -75,7 +79,7 @@ for idx, val in np.ndenumerate(q_arr):
 
 
     for ax in axs.flat:
-        ax.set(xlabel=r'$s$', ylabel=r'$\alpha$')
+        ax.set(xlabel=r'$s$', ylabel=r'$\beta$')
         ax.xaxis.set_tick_params(which='major', direction='in', top='on', color='0.0')
         ax.yaxis.set_tick_params(which='major', direction='in', top='on', color='0.0')
         ax.spines['bottom'].set_color('0.0')
@@ -110,10 +114,10 @@ for idx, val in np.ndenumerate(q_arr):
     cb2.solids.set_edgecolor("face")
     cb3.solids.set_edgecolor("face")
     cb4.solids.set_edgecolor("face")
-    # cb1.ax.tick_params(size=0)
-    # cb2.ax.tick_params(size=0)
-    # cb3.ax.tick_params(size=0)
-    # cb4.ax.tick_params(size=0)
+    # cb1.ax.tick_params(size=0.5)
+    # cb2.ax.tick_params(size=0.5)
+    # cb3.ax.tick_params(size=0.5)
+    # cb4.ax.tick_params(size=0.5)
 
 
 
@@ -121,8 +125,7 @@ for idx, val in np.ndenumerate(q_arr):
     # cb4.set_label(r'$\hat{A}$',rotation=0)
 
     fig.tight_layout()
-    plt.subplots_adjust(left=0.06, right=0.98, top=0.97, bottom=0.13)
-    plt.savefig('AE_plots_q{}_eta{}.png'.format(q_p/2+0.5, eta_p), format='png',
+    plt.subplots_adjust(left=0.08, right=0.98, top=0.97, bottom=0.12)
+    plt.savefig('AE_plots_beta_q{}_eta{}.eps'.format(q_p/2+0.5, eta_p), format='eps',
                 #This is recommendation for publication plots
                 dpi=1200)
-    plt.close()
