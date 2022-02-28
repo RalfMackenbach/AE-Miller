@@ -8,8 +8,23 @@ from numba import vectorize, njit
 
 
 
-def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign):
-
+def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res=1000,lam_res=1000,del_sign=0.0):
+    """
+    omn         -   number density gradient
+    eta         -   ratio between temperature and density gradient omt/omn
+    epsilon     -   ratio between minor and major radius
+    q           -   safety factor, inverse rotational transform
+    kappa       -   elongation, kappa = major radius / minor radius
+    delta       -   triangularity as defined by Miller
+    dR0dr       -   How quickly R0 changes with flux surfaces
+    s_q         -   Magnetic shear
+    s_kappa     -   Radial derivative of kappa (r/kappa * dkappa/dr)
+    s_delta     -   Radial derivative of delta (r * d arcsin(delta)/dr)
+    alpha       -   Dimensionless pressure gradient, e.g. Shafranov shifts
+    theta_res   -   Resolution of theta array
+    lam_res     -   Resolution for the lambda (pitch angle) integral
+    del_sign    -   Padding around singularity
+    """
 
 
     # create Miller class
