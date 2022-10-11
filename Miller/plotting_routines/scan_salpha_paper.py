@@ -41,8 +41,8 @@ def fmt(x, pos):
 
 
 # Construct grid for total integral
-s_grid          =  np.linspace(-2.0, +2.0, num=100, dtype='float64')
-alpha_grid      =  np.linspace(+0.0, +2.0, num=100, dtype='float64')
+s_grid          =  np.linspace(-2.0, +2.0, num=20, dtype='float64')
+alpha_grid      =  np.linspace(+0.0, +2.0, num=20, dtype='float64')
 
 
 sv, alphav = np.meshgrid(s_grid, alpha_grid, indexing='ij')
