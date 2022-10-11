@@ -19,10 +19,6 @@ from numba.extending import get_cython_function_address
 from numba import vectorize, njit
 import ctypes
 import sys
-wn_input = float(sys.argv[1])
-q_input  = float(sys.argv[2])
-eta_input= float(sys.argv[3])
-
 
 Kaddr = get_cython_function_address("scipy.special.cython_special",    "ellipk")
 Eaddr = get_cython_function_address("scipy.special.cython_special",    "ellipe")
@@ -99,7 +95,7 @@ def integrand(k,s,alpha,q,omn,eta):
 
 # @nb.njit(error_model="numpy",fastmath=True,nopython=False)
 def AE_func(omn,q,s,alpha,eta):
-    return quad(lambda k: integrand(k,s,alpha,q,omn,eta),  0, 1, limit=int(1e6), points=1)
+    return quad(lambda k: q**2.0 * integrand(k,s,alpha,q,omn,eta),  0, 1, limit=int(1e6), points=1)
 
 
 
@@ -113,11 +109,12 @@ def fmt(x, pos):
 
 # Construct grid for total integral
 s_grid      =  np.linspace(-2.0, +2.0,   num=100 ,dtype='float64')
-alpha_grid   = np.linspace(+0.0, +4.0,   num=100 ,dtype='float64')
+alpha_grid   = np.linspace(+0.0, +2.0,   num=100 ,dtype='float64')
 
 
 sv, alphav     = np.meshgrid(s_grid, alpha_grid, indexing='ij')
-AEv            = np.empty_like(sv)
+AEv0            = np.empty_like(sv)
+AEv1            = np.empty_like(sv)
 AEv_err        = np.empty_like(sv)
 
 
@@ -128,42 +125,57 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list = pool.starmap(AE_func, [(wn_input, q_input, sv[idx], alphav[idx], eta_input) for idx, val in np.ndenumerate(sv)])
+    AE_list0 = pool.starmap(AE_func, [(3.0, 0.5, sv[idx], alphav[idx], 0.0) for idx, val in np.ndenumerate(sv)])
+    AE_list1 = pool.starmap(AE_func, [(3.0, 2.0, sv[idx], alphav[idx], 0.0) for idx, val in np.ndenumerate(sv)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()
 
-    AE_list = np.asarray(AE_list)
+    AE_list0 = np.asarray(AE_list0)
+    AE_list1 = np.asarray(AE_list1)
 
     # reorder data full int
     list_idx = 0
     for idx, val in np.ndenumerate(sv):
-        AEv[idx]    = AE_list[list_idx][0]
-        AEv_err[idx]= AE_list[list_idx][1]
+        AEv0[idx]    = AE_list0[list_idx][0]
+        AEv1[idx]    = AE_list1[list_idx][0]
         list_idx = list_idx + 1
 
+    levels0 = np.linspace(0, np.amax(AEv0)**(3/2), 25)
+    levels1 = np.linspace(0, np.amax(AEv1)**(3/2), 25)
 
-
-    fig = plt.figure() #figsize=(3.375, 2.3)
-    ax  = fig.gca()
-    cnt = plt.contourf(alphav, sv, AEv, 25, cmap='plasma')
-    for c in cnt.collections:
+    fig, axs = plt.subplots(1,2, figsize=(6.850394, 5.0/2)) #figsize=(6.850394, 3.0)
+    cnt0 = axs[0].contourf(alphav, sv, AEv0**(3/2), levels=levels0, cmap='plasma')
+    cnt1 = axs[1].contourf(alphav, sv, AEv1**(3/2), levels=levels1, cmap='plasma')
+    for c in cnt0.collections:
         c.set_edgecolor("face")
-    cbar = plt.colorbar(format=ticker.FuncFormatter(fmt))
-    cbar.set_label(r'$\widehat{A}^{3/2}$')
-    cbar.solids.set_edgecolor("face")
-    plt.title(r'Available Energy as a function of $s$ and $\alpha$' '\n' r'$\omega_n$={}, $\eta$={}, $q$={},' '\n'.format(wn_input,eta_input,q_input))
-    plt.xlabel(r'$\alpha$')
-    plt.ylabel(r'$s$')
+    for c in cnt1.collections:
+        c.set_edgecolor("face")
+    cbar0 = fig.colorbar(cnt0,ticks=[0.0, np.amax(AEv0)**(3/2)],ax=axs[0])
+    cbar1 = fig.colorbar(cnt1,ticks=[0.0, np.amax(AEv1)**(3/2)],ax=axs[1])
+    cbar0.solids.set_edgecolor("face")
+    cbar1.solids.set_edgecolor("face")
+    cbar1.set_label(r'$\left(\widehat{A}/\sqrt{\epsilon} \right)^{3/2}$')
+    axs[0].set_xlabel(r'$\alpha$')
+    axs[1].set_xlabel(r'$\alpha$')
+    axs[0].set_ylabel(r'$s$')
+
+    axs[0].text(1.7, -1.5, r'$(a)$',c='white')
+    axs[1].text(1.7, -1.5, r'$(b)$',c='white')
+
     # plt.text(3.2, -1.6, r'$(b)$',c='white')
-    ax.xaxis.set_tick_params(which='major', direction='in', top='on')
-    ax.xaxis.set_tick_params(which='minor', direction='in', top='on')
-    ax.yaxis.set_tick_params(which='major', direction='in', top='on')
-    ax.yaxis.set_tick_params(which='minor', direction='in', top='on')
+    axs[0].xaxis.set_tick_params(which='major', direction='in', top='on')
+    axs[0].xaxis.set_tick_params(which='minor', direction='in', top='on')
+    axs[0].yaxis.set_tick_params(which='major', direction='in', top='on')
+    axs[0].yaxis.set_tick_params(which='minor', direction='in', top='on')
+    axs[1].xaxis.set_tick_params(which='major', direction='in', top='on')
+    axs[1].xaxis.set_tick_params(which='minor', direction='in', top='on')
+    axs[1].yaxis.set_tick_params(which='major', direction='in', top='on')
+    axs[1].yaxis.set_tick_params(which='minor', direction='in', top='on')
     plt.tight_layout()
     # plt.subplots_adjust(left=0.15, right=0.88, top=0.96, bottom=0.14)
     plt.margins(0.1)
-    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/s-alpha/s-alpha_paper.eps'), format='eps',
+    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/s-alpha/s-alpha_paper.eps', format='eps',
                 #This is recommendation for publication plots
                 dpi=1000,
                 # Plot will be occupy a maximum of available space

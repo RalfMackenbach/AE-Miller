@@ -1,0 +1,167 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 13.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      6029,        157]
+NotebookOptionsPosition[      5552,        140]
+NotebookOutlinePosition[      5948,        156]
+CellTagsIndexPosition[      5905,        153]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"R", "[", 
+   RowBox[{
+   "\[Theta]_", ",", "\[Delta]_", ",", "\[Kappa]_", ",", "\[Epsilon]_"}], 
+   "]"}], ":=", 
+  RowBox[{"1", "+", 
+   RowBox[{"\[Epsilon]", "*", 
+    RowBox[{"Cos", "[", 
+     RowBox[{"\[Theta]", "+", 
+      RowBox[{
+       RowBox[{"ArcSin", "[", "\[Delta]", "]"}], "*", 
+       RowBox[{"Sin", "[", "\[Theta]", "]"}]}]}], 
+     "]"}]}]}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Z", "[", 
+   RowBox[{
+   "\[Theta]_", ",", "\[Delta]_", ",", "\[Kappa]_", ",", "\[Epsilon]_"}], 
+   "]"}], ":=", 
+  RowBox[{"\[Epsilon]", "*", "\[Kappa]", "*", 
+   RowBox[{"Sin", "[", "\[Theta]", "]"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"Manipulate", "[", 
+  RowBox[{
+   RowBox[{"ParametricPlot", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"R", "[", 
+        RowBox[{
+        "\[Theta]", ",", "\[Delta]", ",", "\[Kappa]", ",", "\[Epsilon]"}], 
+        "]"}], ",", 
+       RowBox[{"Z", "[", 
+        RowBox[{
+        "\[Theta]", ",", "\[Delta]", ",", "\[Kappa]", ",", "\[Epsilon]"}], 
+        "]"}]}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"\[Theta]", ",", "0", ",", 
+       RowBox[{"2", "*", "\[Pi]"}]}], "}"}], ",", 
+     RowBox[{"PlotRange", "\[Rule]", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"0", ",", "2"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"-", "2"}], ",", "2"}], "}"}]}], "}"}]}]}], "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"\[Delta]", ",", "0"}], "}"}], ",", 
+     RowBox[{"-", "0.99"}], ",", "0.99"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"\[Kappa]", ",", "1"}], "}"}], ",", "0", ",", "2"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"\[Epsilon]", ",", "0.5"}], "}"}], ",", "0.1", ",", "0.9"}], 
+    "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.873779507764139*^9, 3.873779555941349*^9}, {
+  3.8737795902871304`*^9, 3.873779619334566*^9}, {3.873779665301322*^9, 
+  3.87377973644368*^9}, {3.8737798763014107`*^9, 3.873779882802754*^9}, {
+  3.873780055171178*^9, 3.873780070175967*^9}, {3.873780272197847*^9, 
+  3.873780329594143*^9}, {3.873791894313966*^9, 3.873791912198865*^9}, {
+  3.873799103852592*^9, 3.873799133279298*^9}},
+ CellLabel->"In[68]:=",ExpressionUUID->"6de3e2d3-fca7-44b0-a40a-88d3a1532dc8"],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`\[Delta]$$ = 
+    0.9, $CellContext`\[Epsilon]$$ = 0.9, $CellContext`\[Kappa]$$ = 2., 
+    Typeset`show$$ = True, Typeset`bookmarkList$$ = {}, 
+    Typeset`bookmarkMode$$ = "Menu", Typeset`animator$$, Typeset`animvar$$ = 
+    1, Typeset`name$$ = "\"untitled\"", Typeset`specs$$ = {{{
+       Hold[$CellContext`\[Delta]$$], 0}, -0.99, 0.99}, {{
+       Hold[$CellContext`\[Kappa]$$], 1}, 0, 2}, {{
+       Hold[$CellContext`\[Epsilon]$$], 0.5}, 0.1, 0.9}}, Typeset`size$$ = {
+    232., {214., 218.}}, Typeset`update$$ = 0, Typeset`initDone$$, 
+    Typeset`skipInitDone$$ = True}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, 
+      "Variables" :> {$CellContext`\[Delta]$$ = 0, $CellContext`\[Epsilon]$$ = 
+        0.5, $CellContext`\[Kappa]$$ = 1}, "ControllerVariables" :> {}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, "Body" :> ParametricPlot[{
+         $CellContext`R[$CellContext`\[Theta], $CellContext`\[Delta]$$, \
+$CellContext`\[Kappa]$$, $CellContext`\[Epsilon]$$], 
+         $CellContext`Z[$CellContext`\[Theta], $CellContext`\[Delta]$$, \
+$CellContext`\[Kappa]$$, $CellContext`\[Epsilon]$$]}, {$CellContext`\[Theta], 
+         0, 2 Pi}, PlotRange -> {{0, 2}, {-2, 2}}], 
+      "Specifications" :> {{{$CellContext`\[Delta]$$, 0}, -0.99, 
+         0.99}, {{$CellContext`\[Kappa]$$, 1}, 0, 
+         2}, {{$CellContext`\[Epsilon]$$, 0.5}, 0.1, 0.9}}, "Options" :> {}, 
+      "DefaultOptions" :> {}],
+     ImageSizeCache->{276., {300., 306.}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UndoTrackedVariables:>{Typeset`show$$, Typeset`bookmarkMode$$},
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{{3.873779715797839*^9, 3.873779736853938*^9}, 
+   3.8737798837462797`*^9, {3.873780031939464*^9, 3.873780032683009*^9}, {
+   3.873780310875306*^9, 3.873780329916172*^9}, 3.8737811673692923`*^9, 
+   3.873791912718409*^9, 3.873796398339983*^9, {3.8737991068416853`*^9, 
+   3.8737991366989202`*^9}, 3.873865073282133*^9},
+ CellLabel->"Out[70]=",ExpressionUUID->"570ee84d-3726-4695-bdf1-f315341a4a25"]
+}, Open  ]]
+},
+WindowSize->{2048, 1099},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"13.0 for Mac OS X ARM (64-bit) (December 2, 2021)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"e7613932-d875-4757-9fd2-32dc606bb3d2"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 2379, 66, 73, "Input",ExpressionUUID->"6de3e2d3-fca7-44b0-a40a-88d3a1532dc8"],
+Cell[2962, 90, 2574, 47, 648, "Output",ExpressionUUID->"570ee84d-3726-4695-bdf1-f315341a4a25"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
+
