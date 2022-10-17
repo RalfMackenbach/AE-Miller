@@ -16,18 +16,19 @@ rc('text', usetex=True)
 
 omn     = 3.0
 eta     = 0.0
-epsilon = 1/3
-q       = 2.0
+epsilon = 0.1
+q       = 3.0
 kappa   = 'scan'
 delta   = 'scan'
 dR0dr   = 0.0
-s_q     = 0.0
+s_q     = 1.0
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
-theta_res   = int(1e3)
+theta_res   = int(1e2)
 lam_res     = int(1e3)
 del_sign    = 0.0
+L_ref       =   'major'
 
 
 dR0dr_f = lambda x: - 2 * ( x**2.0 + 1)/(3 * x**2.0 + 1) * 0.1 + 0.5 * (x**2.0 - 1)/(3*x**2.0 + 1)
@@ -59,7 +60,7 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign) for idx, val in np.ndenumerate(kappav)])
+    AE_list = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(kappav)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()

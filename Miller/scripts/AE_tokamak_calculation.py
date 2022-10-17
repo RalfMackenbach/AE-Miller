@@ -10,7 +10,7 @@ from numba import vectorize, njit
 
 
 
-def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res=1000,lam_res=1000,del_sign=0.0,plot=False):
+def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res=1000,lam_res=1000,del_sign=0.0,L_ref='major',plot=False):
     """
     omn         -   number density gradient
     eta         -   ratio between temperature and density gradient omt/omn
@@ -22,10 +22,13 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
     s_q         -   Magnetic shear
     s_kappa     -   Radial derivative of kappa (r/kappa * dkappa/dr)
     s_delta     -   Radial derivative of delta (r * d arcsin(delta)/dr)
-    alpha       -   Dimensionless pressure gradient, e.g. Shafranov shifts
+    alpha       -   Dimensionless pressure gradient, i.e. Shafranov shifts
     theta_res   -   Resolution of theta array
     lam_res     -   Resolution for the lambda (pitch angle) integral
     del_sign    -   Padding around singularity
+    plot        -   Make plot showing AE per bounce well
+    L_ref       -   Decides the normalisation. If 'major', omn = R0/n dn/dr and
+                    rho* = rho/R_0. If 'minor', omn = r/n dn/dr and rho* = rho/r.
     """
 
     # create Miller class
@@ -57,8 +60,12 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
     l_theta     = Mf.ltheta(theta_arr,MC)
 
     lam_arr     = np.delete(np.linspace(1/np.amax(b_arr),1/np.amin(b_arr),lam_res+1,endpoint=False),0)
+    oml_arr     = np.empty_like(lam_arr)
     AE_arr      = np.empty_like(lam_arr)
     ae_list     = []
+
+    if L_ref == 'minor':
+        omn = omn/epsilon
 
     for idx, lam_val in enumerate(lam_arr):
         averaging_arr   = ( 2 * ( 1 - lam_val*b_arr ) * ( rdbdrho - rdbpdrho - 1/Rc ) - lam_val * b_arr * rdbdrho ) / ( MC.epsilon * bps * Rs ) 
@@ -70,6 +77,7 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
         int_z           = vint(omn / (oml) * (1. - 3./2. * eta),1. - omn / (oml) * eta)
         ae_list.append(int_z * oml**2.0 * g_hat_eps / eps)
         AE_arr[idx]     = np.sum(int_z * oml**2.0 * g_hat_eps / eps)
+        oml_arr[idx]    = oml[0]
 
     if plot == True:
         bw_list = []
@@ -78,7 +86,12 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
             bw_list.append(t_wells)
         plot_AE_per_bouncewell(theta_arr,b_arr,rdbdrho,lam_arr,bw_list,ae_list,1.0)
 
-    return q**2.0 * np.sqrt(epsilon) * np.trapz(AE_arr,lam_arr)
+    fluxtube_vol = np.trapz(l_theta/bps,theta_arr) / MC.xi
+
+    if L_ref == 'major':
+        return np.sqrt(epsilon) * q**2.0 * np.trapz(AE_arr,lam_arr) / fluxtube_vol
+    if L_ref == 'minor':
+        return epsilon**(5/2) * q**2.0 * np.trapz(AE_arr,lam_arr) / fluxtube_vol 
 
 
 
@@ -126,6 +139,5 @@ def plot_AE_per_bouncewell(theta_arr,b_arr,dbdx_arr,lam_arr,bw,ae_list,n_pol):
     cbar = plt.colorbar(cm.ScalarMappable(norm=mplc.Normalize(vmin=0.0, vmax=max_val, clip=False), cmap=cm.plasma), ticks=[0, max_val], ax=ax,location='bottom',label=r'$\widehat{A}_\lambda$') #'%.3f'
     cbar.ax.set_xticklabels([0, round(max_val, 1)])
     plt.show()
-
 
 

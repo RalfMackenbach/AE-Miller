@@ -1,6 +1,6 @@
 import random
 import f90nml
-import matplotlib.pyplot as pp
+import matplotlib.pyplot as plt
 import sys
 import numpy as np
 random.seed(10)
@@ -10,11 +10,6 @@ sys.path.insert(1, '/Users/ralfmackenbach/Documents/GitHub/AE-tok/Miller/scripts
 import AE_tokamak_calculation as AEtok
 
 
-
-
-def plot_at_y(arr, val, **kwargs):
-    pp.semilogx(arr, np.zeros_like(arr) + val, 'x', **kwargs)
-    pp.show()
 
 
 
@@ -40,7 +35,7 @@ while idx<10:
     s_kappa     = round(random.uniform(+0.0,  0.1),   prec)
     s_delta     = delta/np.sqrt((1-delta**2.0))
     alpha       = round(random.uniform(0.0,  0.2),   prec)
-    omn         = round(random.uniform(3, 4),        prec) 
+    omn         = round(random.uniform(3, 4),        prec)
 
     nml['geometry']['q0']       =   q
     nml['geometry']['shat']     =   s_q
@@ -59,10 +54,13 @@ while idx<10:
     nml['in_out']['diagdir']    =   '/ptmp/ralfm/GENE_sims/miller/miller_{}/'.format(idx)
 
 
-    AE_val = AEtok.calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,1001,1001,0.0,plot=False)
+    AE_val = AEtok.calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,1001,1001,0.0,L_ref='minor',plot=False)
     print(AE_val)
     nml.write('parameters_miller{}.nml'.format(idx),force=True)
     idx = idx + 1
     AE_list.append(AE_val)
 
-plot_at_y(np.asarray(AE_list)**(3/2),0)
+Q_avai = np.asarray(AE_list)
+Q_GENE = np.asarray([24.74,4.72,14.68,44.08,7.79,133.21,631.37,70.97,41.15,15.57])
+plt.scatter(np.log(Q_avai),np.log(Q_GENE))
+plt.show()

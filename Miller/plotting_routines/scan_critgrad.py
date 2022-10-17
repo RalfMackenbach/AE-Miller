@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(1, '/Users/ralfmackenbach/Documents/GitHub/AE-tok/Miller/scripts')
 import numpy as np
 import multiprocessing as mp
 import time
@@ -15,19 +17,20 @@ rc('text', usetex=True)
 
 omn     = 'scan'
 res     = 100
-eta     = 1.5
-epsilon = 0.16
-q       = 1.4
-kappa   = 1.0
-delta   = 0.0
+eta     = 0.0
+epsilon = 0.3
+q       = 2.0
+kappa   = 2.0
+delta   = -0.6
 dR0dr   = 0.0
-s_q     = 0.8
+s_q     = 0.0
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
 theta_res   = int(1e2 +1)
 lam_res     = int(1e4)
 del_sign    = 0.0
+L_ref       = 'minor'
 
 
 
@@ -55,7 +58,7 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list = pool.starmap(AEtok.calc_AE, [(omn_grid[idx],eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign) for idx, val in np.ndenumerate(omn_grid)])
+    AE_list = pool.starmap(AEtok.calc_AE, [(omn_grid[idx],eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(omn_grid)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()

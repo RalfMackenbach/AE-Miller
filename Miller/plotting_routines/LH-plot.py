@@ -1,4 +1,6 @@
 import sys
+
+from Miller.plotting_routines.LH-plot-3D import L_ref
 sys.path.insert(1, '/Users/ralfmackenbach/Documents/GitHub/AE-tok/Miller/scripts')
 import numpy as np
 import multiprocessing as mp
@@ -27,6 +29,7 @@ s_delta = 0.0
 theta_res   = int(1e2 +1)
 lam_res     = int(1e3)
 del_sign    = 0.0
+L_ref       =   'major'
 
 
 

@@ -163,9 +163,4 @@ if __name__ == "__main__":
     plt.tight_layout()
     # plt.subplots_adjust(left=0.15, right=0.88, top=0.96, bottom=0.14)
     plt.margins(0.1)
-    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/s-alpha/s-alpha_paper.eps'), format='eps',
-                #This is recommendation for publication plots
-                dpi=1000,
-                # Plot will be occupy a maximum of available space
-                bbox_inches='tight', pad_inches = 0.01)
     plt.show()
