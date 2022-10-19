@@ -115,8 +115,8 @@ def fmt(x, pos):
 
 
 # Construct grid for total integral
-s_grid      =  np.linspace(-2.0, +2.0,   num=20 ,dtype='float64')
-alpha_grid   = np.linspace(+0.0, +2.0,   num=20 ,dtype='float64')
+s_grid      =  np.linspace(-2.0, +2.0,   num=100 ,dtype='float64')
+alpha_grid   = np.linspace(+0.0, +2.0,   num=100 ,dtype='float64')
 
 
 sv, alphav     = np.meshgrid(s_grid, alpha_grid, indexing='ij')
@@ -148,27 +148,42 @@ if __name__ == "__main__":
         AEv1[idx]    = AE_list1[list_idx]
         list_idx = list_idx + 1
 
-    levels0 = np.linspace(0, np.amax(AEv0)**(3/2), 25)
-    levels1 = np.linspace(0, np.amax(AEv1)**(3/2), 25)
+    rel_err = np.abs((AEv1-AEv0)/AEv0)
 
-    fig, axs = plt.subplots(1,2, figsize=(6.850394, 5.0/2)) #figsize=(6.850394, 3.0)
-    cnt0 = axs[0].contourf(alphav, sv, AEv0**(3/2), levels=levels0, cmap='plasma')
-    cnt1 = axs[1].contourf(alphav, sv, AEv1**(3/2), levels=levels1, cmap='plasma')
+    levels0 = np.linspace(0, np.amax(AEv0), 25)
+    levels1 = np.linspace(0, np.amax(AEv1), 25)
+    levels2 = np.linspace(0, 0.1, 25)
+
+    fig, axs = plt.subplots(1,3, figsize=(6.850394, 5.0/2)) #figsize=(6.850394, 3.0)
+    cnt0 = axs[0].contourf(alphav, sv, AEv0, levels=levels0, cmap='plasma')
+    cnt1 = axs[1].contourf(alphav, sv, AEv1, levels=levels1, cmap='plasma')
+    cnt2 = axs[2].contourf(alphav, sv, rel_err, levels=levels2, cmap='plasma')
     for c in cnt0.collections:
         c.set_edgecolor("face")
     for c in cnt1.collections:
         c.set_edgecolor("face")
-    cbar0 = fig.colorbar(cnt0,ticks=[0.0, np.amax(AEv0)**(3/2)],ax=axs[0])
-    cbar1 = fig.colorbar(cnt1,ticks=[0.0, np.amax(AEv1)**(3/2)],ax=axs[1])
+    for c in cnt2.collections:
+        c.set_edgecolor("face")
+    cbar0 = fig.colorbar(cnt0,ticks=[0.0, np.amax(AEv0)],ax=axs[0],orientation="horizontal",pad=0.2)
+    cbar1 = fig.colorbar(cnt1,ticks=[0.0, np.amax(AEv1)],ax=axs[1],orientation="horizontal",pad=0.2)
+    cbar2 = fig.colorbar(cnt2,ticks=[0.0, 0.1],ax=axs[2],orientation="horizontal",pad=0.2)
+    cbar0.ax.set_xticklabels([r'$0$',r'$1.4 \times 10^{-4}$'])
+    cbar1.ax.set_xticklabels([r'$0$',r'$1.4 \times 10^{-4}$'])
+    cbar2.ax.set_xticklabels([r'$0\%$',r'$10\%$'])
     cbar0.solids.set_edgecolor("face")
     cbar1.solids.set_edgecolor("face")
-    cbar1.set_label(r'$\widehat{A}^{3/2}$')
+    cbar2.solids.set_edgecolor("face")
+    cbar0.set_label(r'$\widehat{A}$')
+    cbar1.set_label(r'$\widehat{A}$')
+    cbar2.set_label(r'$\mathrm{Error}$')
     axs[0].set_xlabel(r'$\alpha$')
     axs[1].set_xlabel(r'$\alpha$')
+    axs[2].set_xlabel(r'$\alpha$')
     axs[0].set_ylabel(r'$s$')
 
-    axs[0].text(1.7, -1.5, r'$s$-$\alpha$',c='white',ha='center', va='center')
-    axs[1].text(1.7, -1.5, r'$\mathrm{Miller}$',c='white',ha='center', va='center')
+    axs[0].text(1.7, -1.5, r'$(a)$',c='white',ha='center', va='center')
+    axs[1].text(1.7, -1.5, r'$(b)$',c='white',ha='center', va='center')
+    axs[2].text(1.7, -1.5, r'$(c)$',c='white',ha='center', va='center')
 
     # plt.text(3.2, -1.6, r'$(b)$',c='white')
     axs[0].xaxis.set_tick_params(which='major', direction='in', top='on')
@@ -179,6 +194,10 @@ if __name__ == "__main__":
     axs[1].xaxis.set_tick_params(which='minor', direction='in', top='on')
     axs[1].yaxis.set_tick_params(which='major', direction='in', top='on')
     axs[1].yaxis.set_tick_params(which='minor', direction='in', top='on')
+    axs[2].xaxis.set_tick_params(which='major', direction='in', top='on')
+    axs[2].xaxis.set_tick_params(which='minor', direction='in', top='on')
+    axs[2].yaxis.set_tick_params(which='major', direction='in', top='on')
+    axs[2].yaxis.set_tick_params(which='minor', direction='in', top='on')
     plt.tight_layout()
     # plt.subplots_adjust(left=0.15, right=0.88, top=0.96, bottom=0.14)
     plt.margins(0.1)
