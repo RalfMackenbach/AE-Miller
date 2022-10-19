@@ -98,9 +98,12 @@ def integrand(k,s,alpha,q,omn,eta):
 
 
 # @nb.njit(error_model="numpy",fastmath=True,nopython=False)
-def AE_func(omn,q,s,alpha,eta):
-    return quad(lambda k: integrand(k,s,alpha,q,omn,eta),  0, 1, limit=int(1e6), points=1)
-
+def AE_func(omn,q,s,alpha,eta,epsilon=0.3,L_ref='minor'):
+    if L_ref == 'minor':
+        omn = omn/epsilon 
+        return q**2 * epsilon**(5/2) * quad(lambda k: integrand(k,s,alpha,q,omn,eta),  0, 1, limit=int(1e6))
+    if L_ref == 'major':
+        return q**2 * epsilon**(1/2) * quad(lambda k: integrand(k,s,alpha,q,omn,eta),  0, 1, limit=int(1e6), points=1)
 
 
 def fmt(x, pos):

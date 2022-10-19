@@ -15,12 +15,12 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 #rc('font',**{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)
 
-omn     = 3.0
+omn     = 3
 eta     = 0.0
-epsilon = 0.3
+epsilon = 1/3
 q       = 2.0
-kappa   = 1.5
-delta   = 0.6
+kappa   = 1.0
+delta   = 0.0
 dR0dr   = 0.0
 s_q     = 'scan'
 s_kappa = 0.0
@@ -92,7 +92,6 @@ if __name__ == "__main__":
     for c in cnt.collections:
         c.set_edgecolor("face")
     cbar = plt.colorbar(ticks=[0.0, np.amax(AE_list**(3/2))])
-    cbar.ax.set_yticklabels([r'$0.0$', r'$6.3$'])
     cbar.set_label(r'$\widehat{A}^{3/2}$')
     # cbar.set_label(r'$\widehat{A}$')
     cbar.solids.set_edgecolor("face")

@@ -16,8 +16,8 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 rc('text', usetex=True)
 
 omn     = 3.0
-eta     = 1.0
-epsilon = 0.3
+eta     = 0.0
+epsilon = 1/3
 q       = 2.0
 kappa   = 1.0
 delta   = 0.0
@@ -29,7 +29,7 @@ alpha   = 0.0
 theta_res   = int(1e2 +1)
 lam_res     = int(1e3)
 del_sign    = 0.0
-L_ref       = 'major'
+L_ref       = 'minor'
 
 
 
@@ -42,8 +42,8 @@ def fmt(x, pos):
 
 
 # Construct grid for total integral
-kappa_grid      =  np.linspace(+0.5, +2.0, num=20, dtype='float64')
-delta_grid      =  np.linspace(-0.8, +0.8, num=20, dtype='float64')
+kappa_grid      =  np.linspace(+0.5, +2.0, num=100, dtype='float64')
+delta_grid      =  np.linspace(-0.8, +0.8, num=100, dtype='float64')
 
 
 kappav, deltav = np.meshgrid(kappa_grid, delta_grid, indexing='ij')
@@ -63,11 +63,11 @@ if __name__ == "__main__":
     start_time = time.time()
     AE_list_0 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q, kappav[idx], deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_0)])
 
-    AE_list_1 = pool.starmap(AEtok.calc_AE, [(omn,eta,    0.7,  q, kappav[idx], deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_1)])
+    AE_list_1 = pool.starmap(AEtok.calc_AE, [(omn,eta,    2/3,  q, kappav[idx], deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_1)])
 
     AE_list_2 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,1.0, kappav[idx], deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_2)])
 
-    AE_list_3 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q, kappav[idx], deltav[idx],dR0dr,1.0,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_3)])
+    AE_list_3 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q, kappav[idx], deltav[idx],dR0dr,-1 ,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_3)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()

@@ -94,9 +94,13 @@ def integrand(k,s,alpha,q,omn,eta):
 
 
 # @nb.njit(error_model="numpy",fastmath=True,nopython=False)
-def AE_func(omn,q,s,alpha,eta):
-    return quad(lambda k: q**2.0 * integrand(k,s,alpha,q,omn,eta),  0, 1, limit=int(1e6), points=1)
-
+def AE_func(omn,q,s,alpha,eta,epsilon=0.1,L_ref='minor'):
+    if L_ref == 'minor':
+        omn = omn/epsilon 
+        int_val = np.asarray(quad(lambda k: integrand(k,s,alpha,q,omn,eta),  0, 1, limit=int(1e6)))
+        return q**2 * epsilon**(5/2) * int_val
+    if L_ref == 'major':
+        return q**2 * epsilon**(1/2) * int_val
 
 
 def fmt(x, pos):
@@ -125,8 +129,8 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list0 = pool.starmap(AE_func, [(3.0, 0.5, sv[idx], alphav[idx], 0.0) for idx, val in np.ndenumerate(sv)])
-    AE_list1 = pool.starmap(AE_func, [(3.0, 2.0, sv[idx], alphav[idx], 0.0) for idx, val in np.ndenumerate(sv)])
+    AE_list0 = pool.starmap(AE_func, [(1.0, 0.5, sv[idx], alphav[idx], 0.0, 1/3, 'minor') for idx, val in np.ndenumerate(sv)])
+    AE_list1 = pool.starmap(AE_func, [(1.0, 2.0, sv[idx], alphav[idx], 0.0, 1/3, 'minor') for idx, val in np.ndenumerate(sv)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()
@@ -155,7 +159,7 @@ if __name__ == "__main__":
     cbar1 = fig.colorbar(cnt1,ticks=[0.0, np.amax(AEv1)**(3/2)],ax=axs[1])
     cbar0.solids.set_edgecolor("face")
     cbar1.solids.set_edgecolor("face")
-    cbar1.set_label(r'$\left(\widehat{A}/\sqrt{\epsilon} \right)^{3/2}$')
+    cbar1.set_label(r'$\widehat{A}^{3/2}$')
     axs[0].set_xlabel(r'$\alpha$')
     axs[1].set_xlabel(r'$\alpha$')
     axs[0].set_ylabel(r'$s$')

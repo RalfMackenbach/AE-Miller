@@ -17,7 +17,7 @@ rc('text', usetex=True)
 
 omn     = 3.0
 eta     = 0.0
-epsilon = 0.3
+epsilon = 1/3
 q       = 2.0
 kappa   = 1.7
 delta   = 0.5
@@ -42,8 +42,8 @@ def fmt(x, pos):
 
 
 # Construct grid for total integral
-s_grid          =  np.linspace(-2.0, +2.0, num=20, dtype='float64')
-alpha_grid      =  np.linspace(+0.0, +2.0, num=20, dtype='float64')
+s_grid          =  np.linspace(-2.0, +2.0, num=100, dtype='float64')
+alpha_grid      =  np.linspace(+0.0, +2.0, num=100, dtype='float64')
 
 
 sv, alphav = np.meshgrid(s_grid, alpha_grid, indexing='ij')
@@ -63,9 +63,9 @@ if __name__ == "__main__":
     start_time = time.time()
     AE_list_0 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q, kappa, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_0)])
 
-    AE_list_1 = pool.starmap(AEtok.calc_AE, [(omn,eta,    0.7,  q, kappa, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_1)])
+    AE_list_1 = pool.starmap(AEtok.calc_AE, [(omn,eta,    2/3,  q, kappa, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_1)])
 
-    AE_list_2 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,1.0, kappa, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_2)])
+    AE_list_2 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q,   0.5, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_2)])
 
     AE_list_3 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q, kappa,-delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_3)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))

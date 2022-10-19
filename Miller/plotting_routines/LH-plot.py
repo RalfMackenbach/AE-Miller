@@ -1,6 +1,4 @@
 import sys
-
-from Miller.plotting_routines.LH-plot-3D import L_ref
 sys.path.insert(1, '/Users/ralfmackenbach/Documents/GitHub/AE-tok/Miller/scripts')
 import numpy as np
 import multiprocessing as mp
@@ -19,7 +17,7 @@ rc('text', usetex=True)
 
 omn     = 'scan'
 eta     = 0.0
-epsilon = 0.3
+epsilon = 1/3
 q       = 3.0
 kappa   = 2.0
 delta   = np.asarray([-0.7,0.7])
@@ -27,9 +25,9 @@ dR0dr   = 0.0
 s_kappa = 0.0
 s_delta = 0.0
 theta_res   = int(1e2 +1)
-lam_res     = int(1e3)
+lam_res     = int(1e4)
 del_sign    = 0.0
-L_ref       =   'major'
+L_ref       = 'minor'
 
 
 
@@ -42,7 +40,7 @@ def fmt(x, pos):
 
 
 # Construct grid for total integral
-omn_grid          =  np.linspace(0, +10, num=100, dtype='float64')
+omn_grid          =  np.linspace(0, 10, num=100, dtype='float64')
 
 
 omnv,  deltav  = np.meshgrid(omn_grid,delta)
@@ -57,7 +55,7 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list = pool.starmap(AEtok.calc_AE, [(omnv[idx],eta,epsilon,q,kappa,deltav[idx],dR0dr,2 - 1*omnv[idx]/10 ,s_kappa,s_delta, 2 * omnv[idx]/10,theta_res,lam_res,del_sign) for idx, val in np.ndenumerate(AEv)])
+    AE_list = pool.starmap(AEtok.calc_AE, [(omnv[idx],eta,epsilon,q,kappa,deltav[idx],dR0dr,2 - 2*omnv[idx]/10 ,s_kappa,s_delta, 2 * omnv[idx]/10,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()
@@ -87,7 +85,7 @@ if __name__ == "__main__":
     cnt0 = plt.plot(omnv[0,:], AEv[0,:],'red',label=r'$\delta = -0.7$')
     plt.legend()
     # plt.title(r'Available Energy as a function of $s$ and $\alpha$' '\n' r'$\omega_n$={}, $\eta$={}, $\epsilon$={}, $q$={}, $d R_0/ d r$={}, $\kappa$={}, $s_\kappa$={}, $\delta$={}, $s_\delta$={}' '\n'.format(omn,eta,epsilon,q,dR0dr,kappa,s_kappa,delta,s_delta))
-    plt.xlabel(r'$\hat{\omega}_n$')
+    plt.xlabel(r'$\tilde{\omega}_n$')
     plt.ylabel(r'$\widehat{A}$')
     # plt.text(3.2, -1.6, r'$(b)$',c='white')
     ax.xaxis.set_tick_params(which='major', direction='in', top='on')
@@ -95,7 +93,8 @@ if __name__ == "__main__":
     ax.yaxis.set_tick_params(which='major', direction='in', top='on')
     ax.yaxis.set_tick_params(which='minor', direction='in', top='on')
     ax.grid(True)
-    ax.text(1,25,r'$(c)$',horizontalalignment='center',verticalalignment='center')
+    aemax=np.amax(AEv)
+    ax.text(1,25/30*aemax,r'$(c)$',horizontalalignment='center',verticalalignment='center')
     plt.tight_layout()
     # plt.subplots_adjust(left=0.15, right=0.88, top=0.96, bottom=0.14)
     plt.margins(0.1)

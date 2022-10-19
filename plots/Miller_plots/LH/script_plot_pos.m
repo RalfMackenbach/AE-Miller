@@ -1,6 +1,6 @@
 Xline= [0,  10];
 Yline= [0,  2];
-Zline= [2, 1];
+Zline= [2, 0];
 
 color = 'blue';
 p = plot3(Xline,Yline,Zline,color);
@@ -23,7 +23,7 @@ hold off;
 alpha0=0.6;
 
 
-name = 'isocontour_eta=0.0_eps=0.3_q=3.0_kappa=2.0_delta=0.7_dR0dr=0.0_skappa=0.0_sdelta=0.0.hdf5';
+name = 'isocontour_eta=0.0_eps=0.3333333333333333_q=3.0_kappa=2.0_delta=0.7_dR0dr=0.0_skappa=0.0_sdelta=0.0.hdf5';
 
 % import stuff
 omn_mat     = h5read(name, '/omnv' );
@@ -64,7 +64,7 @@ isonormals(omn_mat,alpha_mat,s_mat,AE_mat,p4);
 set(p4,'FaceColor','[0.9411    0.3562    0.0705]','EdgeColor','none','FaceAlpha',alpha0); % set the color
 
 daspect([1,1,1]);
-xlabel('$\hat{\omega}_n$','Interpreter','latex');
+xlabel('$\tilde{\omega}_n$','Interpreter','latex');
 ylabel('$\alpha$','Interpreter','latex');
 zlabel('$s$','Interpreter','latex');
 grid on;
