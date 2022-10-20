@@ -26,15 +26,15 @@ idx=0
 
 while idx<10:
     eta         = 0.0
-    epsilon     = round(random.uniform(+0.1,  0.5),   prec)
+    epsilon     = round(random.uniform(+0.1,  0.3),   prec)
     q           = round(random.uniform(+1.1,  4.0),   prec)
     kappa       = round(random.uniform(+1.0,  2.0),   prec)
     delta       = round(random.uniform(-1.0,  1.0),   prec)*epsilon
     dR0dr       = round(random.uniform(+0.0,  0.0),   prec)
-    s_q         = round(random.uniform(-0.5,  0.5),   prec)
+    s_q         = round(random.uniform(-2.0,  2.0),   prec)
     s_kappa     = round(random.uniform(+0.0,  0.1),   prec)
     s_delta     = delta/np.sqrt((1-delta**2.0))
-    alpha       = round(random.uniform(0.0,  0.2),   prec)
+    alpha       = round(random.uniform(0.0,  0.1),   prec)
     omn         = round(random.uniform(3, 4),        prec)
 
     nml['geometry']['q0']       =   q
@@ -53,12 +53,13 @@ while idx<10:
     nml['species'][1]['omn']    =   omn
     nml['in_out']['diagdir']    =   '/ptmp/ralfm/GENE_sims/miller/miller_{}/'.format(idx)
 
-
-    AE_val = AEtok.calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,1001,1001,0.0,L_ref='minor',plot=True)
-    print(AE_val)
-    nml.write('parameters_miller{}.nml'.format(idx),force=True)
-    idx = idx + 1
-    AE_list.append(AE_val)
+    if np.abs(s_q)>0.3:
+        AE_val = AEtok.calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,1001,1001,0.0,L_ref='minor',plot=True)
+        nml.write('parameters_miller{}.nml'.format(idx),force=True)
+        idx = idx + 1
+        AE_list.append(AE_val)
+        print('ae is', AE_val)
+        print('shear is: ',s_q)
 
 Q_avai = np.asarray(AE_list)
 Q_GENE = np.asarray([24.74,4.72,14.68,44.08,7.79,133.21,631.37,70.97,41.15,15.57])

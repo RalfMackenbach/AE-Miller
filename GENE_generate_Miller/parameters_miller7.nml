@@ -63,18 +63,18 @@
 
 &geometry
     magn_geometry = 'miller'
-    q0 = 1.618
-    shat = 0.149
-    amhd = 0.156
-    major_r = 2.8818443804034586
+    q0 = 3.622
+    shat = 1.642
+    amhd = 0.06
+    major_r = 5.617977528089888
     major_z = 0.0
     minor_r = 1.0
-    trpeps = 0.347
-    kappa = 1.119
-    delta = -0.030882999999999997
+    trpeps = 0.178
+    kappa = 1.673
+    delta = -0.092026
     zeta = 0.0
-    s_kappa = 0.082
-    s_delta = -0.030897738023475518
+    s_kappa = 0.052
+    s_delta = -0.09241816683705062
     s_zeta = 0.0
     drr = 0.0
     sign_ip_cw = 1
@@ -83,7 +83,7 @@
 
 &species
     name = 'ions'
-    omn = 3.48
+    omn = 3.063
     omt = 0.0
     mass = 1.0
     temp = 1.0
@@ -93,7 +93,7 @@
 
 &species
     name = 'electrons'
-    omn = 3.48
+    omn = 3.063
     omt = 0.0
     mass = 0.00054466
     temp = 1.0

@@ -64,17 +64,17 @@
 &geometry
     magn_geometry = 'miller'
     q0 = 2.344
-    shat = 0.324
-    amhd = 0.032
-    major_r = 3.03951367781155
+    shat = 1.294
+    amhd = 0.016
+    major_r = 4.672897196261682
     major_z = 0.0
     minor_r = 1.0
-    trpeps = 0.329
+    trpeps = 0.214
     kappa = 1.578
-    delta = -0.19345199999999999
+    delta = -0.125832
     zeta = 0.0
     s_kappa = 0.065
-    s_delta = -0.1971767193156435
+    s_delta = -0.12684018092341803
     s_zeta = 0.0
     drr = 0.0
     sign_ip_cw = 1
