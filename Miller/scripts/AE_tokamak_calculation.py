@@ -10,13 +10,13 @@ from numba import vectorize, njit
 
 
 
-def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res=1000,lam_res=1000,del_sign=0.0,L_ref='major',plot=False):
+def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res=1000,lam_res=1000,del_sign=0.0,L_ref='major',rho=1.0,plot=False):
     """
     omn         -   number density gradient
     eta         -   ratio between temperature and density gradient omt/omn
-    epsilon     -   ratio between minor and major radius
+    epsilon     -   ratio between radial coordinate r and major radius
     q           -   safety factor, inverse rotational transform
-    kappa       -   elongation, kappa = major radius / minor radius
+    kappa       -   elongation, kappa = major radius / minor radius (of ellipse)
     delta       -   triangularity as defined by Miller
     dR0dr       -   How quickly R0 changes with flux surfaces
     s_q         -   Magnetic shear
@@ -26,9 +26,10 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
     theta_res   -   Resolution of theta array
     lam_res     -   Resolution for the lambda (pitch angle) integral
     del_sign    -   Padding around singularity
-    plot        -   Make plot showing AE per bounce well
     L_ref       -   Decides the normalisation. If 'major', omn = R0/n dn/dr and
-                    rho* = rho/R_0. If 'minor', omn = r/n dn/dr and rho* = rho/r.
+                    rho* = rho/R_0. If 'minor', omn = a_minor/n dn/dr and rho* = rho/a_minor.
+    rho         -   ratio between radial coordinate r and a_minor
+    plot        -   Make plot showing AE per bounce well
     """
 
     # create Miller class
@@ -65,7 +66,7 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
     ae_list     = []
 
     if L_ref == 'minor':
-        omn = omn/epsilon
+        omn = rho*omn/epsilon
 
     for idx, lam_val in enumerate(lam_arr):
         averaging_arr   = ( 2 * ( 1 - lam_val*b_arr ) * ( rdbdrho - rdbpdrho - 1/Rc ) - lam_val * b_arr * rdbdrho ) / ( MC.epsilon * bps * Rs ) 
@@ -91,7 +92,7 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
     if L_ref == 'major':
         return np.sqrt(epsilon) * q**2.0 * np.trapz(AE_arr,lam_arr) / fluxtube_vol
     if L_ref == 'minor':
-        return epsilon**(5/2) * q**2.0 * np.trapz(AE_arr,lam_arr) / fluxtube_vol 
+        return (epsilon/rho)**2.0 * np.sqrt(epsilon) * q**2.0 * np.trapz(AE_arr,lam_arr) / fluxtube_vol 
 
 
 

@@ -130,10 +130,13 @@ if __name__ == "__main__":
     pool = mp.Pool(mp.cpu_count())
     print('Number of cores used: {}'.format(mp.cpu_count()))
 
+    omn = 0.003
+    epsilon = 0.001
+
     # time the full integral
     start_time = time.time()
-    AE_list0 = pool.starmap(AE_func, [(0.03, 2.0, sv[idx], alphav[idx], 0.0, 0.01, 'minor') for idx, val in np.ndenumerate(sv)])
-    AE_list1 = pool.starmap(AEtok.calc_AE, [(0.03,0.0,0.01,2.0,1.0,0.0,0.0,sv[idx],0.0,0.0,alphav[idx],int(1e2),int(1e3),0.0,'minor') for idx, val in np.ndenumerate(sv)])
+    AE_list0 = pool.starmap(AE_func, [(omn, 2.0, sv[idx], alphav[idx], 0.0, epsilon, 'minor') for idx, val in np.ndenumerate(sv)])
+    AE_list1 = pool.starmap(AEtok.calc_AE, [(omn,0.0,epsilon,2.0,1.0,0.0,0.0,sv[idx],0.0,0.0,alphav[idx],int(1e2),int(1e3),0.0,'minor') for idx, val in np.ndenumerate(sv)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()
@@ -149,15 +152,18 @@ if __name__ == "__main__":
         list_idx = list_idx + 1
 
     rel_err = np.abs((AEv1-AEv0)/AEv0)
+    print('max AE s-alpha val is', np.amax(AEv0))
+    print('max AE Miller val is', np.amax(AEv1))
+    print('max err is', np.amax(rel_err))
 
     levels0 = np.linspace(0, np.amax(AEv0), 25)
     levels1 = np.linspace(0, np.amax(AEv1), 25)
-    levels2 = np.linspace(0, 0.1, 25)
+    levels2 = np.linspace(0, 0.03, 25)
 
     fig, axs = plt.subplots(1,3, figsize=(6.850394, 5.0/2)) #figsize=(6.850394, 3.0)
     cnt0 = axs[0].contourf(alphav, sv, AEv0, levels=levels0, cmap='plasma')
     cnt1 = axs[1].contourf(alphav, sv, AEv1, levels=levels1, cmap='plasma')
-    cnt2 = axs[2].contourf(alphav, sv, rel_err, levels=levels2, cmap='plasma')
+    cnt2 = axs[2].contourf(alphav, sv, rel_err, levels=levels2, cmap='Greys')
     for c in cnt0.collections:
         c.set_edgecolor("face")
     for c in cnt1.collections:
@@ -166,10 +172,10 @@ if __name__ == "__main__":
         c.set_edgecolor("face")
     cbar0 = fig.colorbar(cnt0,ticks=[0.0, np.amax(AEv0)],ax=axs[0],orientation="horizontal",pad=0.2)
     cbar1 = fig.colorbar(cnt1,ticks=[0.0, np.amax(AEv1)],ax=axs[1],orientation="horizontal",pad=0.2)
-    cbar2 = fig.colorbar(cnt2,ticks=[0.0, 0.1],ax=axs[2],orientation="horizontal",pad=0.2)
-    cbar0.ax.set_xticklabels([r'$0$',r'$1.4 \times 10^{-4}$'])
-    cbar1.ax.set_xticklabels([r'$0$',r'$1.4 \times 10^{-4}$'])
-    cbar2.ax.set_xticklabels([r'$0\%$',r'$10\%$'])
+    cbar2 = fig.colorbar(cnt2,ticks=[0.0, 0.03],ax=axs[2],orientation="horizontal",pad=0.2)
+    cbar0.ax.set_xticklabels([r'$0$',r'$4.3 \times 10^{-7}$'])
+    cbar1.ax.set_xticklabels([r'$0$',r'$4.3 \times 10^{-7}$'])
+    cbar2.ax.set_xticklabels([r'$0\%$',r'$3\%$'])
     cbar0.solids.set_edgecolor("face")
     cbar1.solids.set_edgecolor("face")
     cbar2.solids.set_edgecolor("face")
