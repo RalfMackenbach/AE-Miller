@@ -54,7 +54,7 @@ while idx<10:
     nml['in_out']['diagdir']    =   '/ptmp/ralfm/GENE_sims/miller/miller_{}/'.format(idx)
 
 
-    AE_val = AEtok.calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,1001,1001,0.0,L_ref='minor',plot=False)
+    AE_val = AEtok.calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,1001,1001,0.0,L_ref='minor',plot=True)
     print(AE_val)
     nml.write('parameters_miller{}.nml'.format(idx),force=True)
     idx = idx + 1
