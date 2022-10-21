@@ -15,7 +15,7 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 #rc('font',**{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)
 
-omn     = 3.0
+omn     = 1.0
 eta     = 0.0
 epsilon = 1/3
 q       = 2.0

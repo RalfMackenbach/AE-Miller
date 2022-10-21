@@ -1,0 +1,99 @@
+import sys
+sys.path.insert(1, '/Users/ralfmackenbach/Documents/GitHub/AE-tok/Miller/scripts')
+import numpy as np
+import multiprocessing as mp
+import time
+import matplotlib.pyplot as plt
+import h5py
+import matplotlib        as mpl
+import AE_tokamak_calculation as AEtok
+from matplotlib import rc
+import Miller_functions as Mf
+import matplotlib.ticker as ticker
+import scipy
+import matplotlib.cm as cm
+from matplotlib.colors import Normalize
+rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+## for Palatino and other serif fonts use:
+#rc('font',**{'family':'serif','serif':['Palatino']})
+rc('text', usetex=True)
+
+omn     = 1
+eta     = 0.0
+epsilon = 1/3
+q       = 2.0
+kappa   = 2.0
+delta   = 0.0
+dR0dr   = 0.0
+s_q     = 'scan'
+s_kappa = 0.0
+s_delta = 0.0
+alpha   = 'scan'
+theta_res   = int(1e2 +1)
+lam_res     = int(1e3)
+del_sign    = 0.0
+L_ref       = 'minor'
+
+
+
+
+resolution  = 101
+scan_arr    = np.linspace(-0.5,0.5,resolution)
+s_arr       = np.empty_like(scan_arr)
+alpha_arr   = np.empty_like(scan_arr)
+AE_arr      = np.empty_like(scan_arr)
+marker_vert = []
+
+vals=[0.5,0]
+for idx, val in enumerate(scan_arr):
+    print('at step', idx+1, 'out of', len(scan_arr))
+    #                               (omn,eta,epsilon,  q,kappa,delta,dR0dr, s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref,rho)
+    fun = lambda x: -1*AEtok.calc_AE(omn,eta,epsilon,  q,kappa,  val,dR0dr,x[0],s_kappa,s_delta, x[1],theta_res,lam_res,del_sign,L_ref)
+    res = scipy.optimize.minimize(fun, vals)
+    vals=res.x
+    s_arr[idx] = vals[0]
+    alpha_arr[idx] = vals[1]
+    AE_arr[idx] = -1*fun(vals)
+    # make marker
+    MC       = Mf.MC(0.9,  q,kappa,  val,dR0dr,vals[0],s_kappa,s_delta, vals[1])
+    theta_arr= np.linspace(-np.pi,+np.pi,100,endpoint=True)
+    Rs       = list(Mf.R_s(theta_arr,MC)-1.0)
+    Zs       = list(Mf.Z_s(theta_arr,MC))
+    verts    = list(zip(Rs,Zs))
+    marker_vert.append(verts)
+    # plt.scatter(vals[1],vals[0],marker=verts,s=1000)
+
+
+
+fig = plt.figure(figsize=(3.375, 2.3))
+ax  = fig.gca()
+# plt.scatter(alpha_arr,s_arr,c=AE_arr,cmap='plasma',marker=marker_vert)
+ax.plot(alpha_arr,s_arr,c='black')
+
+# make colormap stuff
+plasma = mpl.colormaps['plasma']
+
+for idx, val in enumerate(AE_arr):
+    if idx%(int(resolution/10))==0:
+        ax.scatter(alpha_arr[idx],s_arr[idx],color=plasma((AE_arr[idx]-AE_arr.min())/(AE_arr.max()-AE_arr.min())),marker=marker_vert[idx],s=150,zorder=2.5)
+
+
+norm = mpl.colors.Normalize(vmin=AE_arr.min(), vmax=AE_arr.max())
+plt.colorbar(cm.ScalarMappable(norm=norm, cmap=plasma),label=r'$\widehat{A}$')
+ax.set_xlabel(r'$\alpha$')
+ax.set_ylabel(r'$s$')
+alpha_range=alpha_arr.max()-alpha_arr.min()
+s_range    =s_arr.max()-s_arr.min()
+ax.set_xlim((alpha_arr.min()-0.1*alpha_range,alpha_arr.max()+0.1*alpha_range))
+ax.set_ylim((s_arr.min()-0.1*s_range,s_arr.max()+0.1*s_range))
+ax.xaxis.set_tick_params(which='major', direction='in', top='on')
+ax.xaxis.set_tick_params(which='minor', direction='in', top='on')
+ax.yaxis.set_tick_params(which='major', direction='in', top='on')
+ax.yaxis.set_tick_params(which='minor', direction='in', top='on')
+plt.tight_layout()
+plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/s-alpha/maximal-points.eps', format='eps',
+                #This is recommendation for publication plots
+                dpi=1000,
+                # Plot will be occupy a maximum of available space
+                bbox_inches='tight')
+plt.show()
