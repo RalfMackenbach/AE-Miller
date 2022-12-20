@@ -10,7 +10,7 @@ from numba import vectorize, njit
 
 
 
-def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res=1000,lam_res=1000,del_sign=0.0,L_ref='major',rho=1.0,plot=False):
+def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res=100,lam_res=1000,del_sign=0.0,L_ref='major',rho=1.0,plot=False):
     """
     omn         -   number density gradient
     eta         -   ratio between temperature and density gradient omt/omn
@@ -61,16 +61,16 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
     l_theta     = Mf.ltheta(theta_arr,MC)
 
     lam_arr     = np.delete(np.linspace(1/np.amax(b_arr),1/np.amin(b_arr),lam_res+1,endpoint=False),0)
-    oml_arr     = np.empty_like(lam_arr)
     AE_arr      = np.empty_like(lam_arr)
     ae_list     = []
+    oml_list    = []
 
     if L_ref == 'minor':
         omn = rho*omn/epsilon
 
     for idx, lam_val in enumerate(lam_arr):
-        averaging_arr   = ( 2 * ( 1 - lam_val*b_arr ) * ( rdbdrho - rdbpdrho - 1/Rc ) - lam_val * b_arr * rdbdrho ) / ( MC.epsilon * bps * Rs ) 
-        f_arr_numer     = averaging_arr * l_theta * b_arr/ bps
+        averaging_arr   = ( 2. * ( 1. - lam_val*b_arr ) * ( rdbdrho - rdbpdrho - 1./Rc ) - lam_val * b_arr * rdbdrho ) / ( MC.epsilon * bps * Rs ) 
+        f_arr_numer     = averaging_arr * l_theta * b_arr / bps
         f_arr_denom     = l_theta * b_arr/ bps
         num,den         = AEtf.omega_lam(theta_arr,b_arr,f_arr_numer,f_arr_denom,lam_val)
         oml             = np.asarray(num)/np.asarray(den)
@@ -78,16 +78,52 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
         int_z           = vint(omn / (oml) * (1. - 3./2. * eta),1. - omn / (oml) * eta)
         ae_list.append(int_z * oml**2.0 * g_hat_eps / eps)
         AE_arr[idx]     = np.sum(int_z * oml**2.0 * g_hat_eps / eps)
-        oml_arr[idx]    = oml[0]
+        oml_list.append(list(oml))
 
     if plot == True:
         bw_list = []
+        k2_arr   = ((1 - lam_arr*np.amin(b_arr))*np.amax(b_arr)/(np.amax(b_arr)-np.amin(b_arr)) )
         for lam_val in lam_arr:
             t_wells, _ = AEtf.bounce_wells(theta_arr, b_arr, lam_val)
             bw_list.append(t_wells)
-        plot_AE_per_bouncewell(theta_arr,b_arr,rdbdrho,lam_arr,bw_list,ae_list,1.0)
+        length = max(map(len, oml_list))
+        oml_arr=np.array([xi+[None]*(length-len(xi)) for xi in oml_list])
+        
+        fig ,axs = plt.subplots(2,2)
+        fig.set_size_inches(2*8,8)
+        fig.suptitle(r'Miller parameters: $\epsilon=${}, $q=${}, $\kappa=${}, $\delta=${}, $\partial_r R_0 =${}, $s_q=${}, $s_\kappa =${}, $s_\delta =${} , $\alpha=${}'.format(epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha))
+        axs[0,0].plot(k2_arr,oml_arr)
+        axs[0,0].set_xlabel(r'$k^2$')
+        axs[0,0].set_xlim((0,1))
+        axs[0,0].set_ylabel(r'$\omega_\lambda$')
+        axs[0,0].set_title('precession')
+        axs[0,1].plot(Rs,Mf.Z_s(theta_arr,MC))
+        axs[0,1].set_aspect('equal')
+        axs[0,1].set_title('cross section')
+        axs[0,1].set_xlabel(r'$R/R_0$')
+        axs[0,1].set_ylabel(r'$Z/R_0$')
+        axs102 = axs[1,0].twinx()
+        axs[1,0].plot(theta_arr,b_arr,color='green')
+        axs[1,0].set_xlabel(r'$\theta$')
+        axs[1,0].set_ylabel(r'$B/B_0$')
+        axs[1,0].set_title('grad B drive')
+        axs[1,0].set_xlim((-np.pi,np.pi))
+        axs102.set_ylabel(r'$\frac{r}{B} \frac{\partial B}{\partial\rho}$')
+        axs102.plot(theta_arr,rdbdrho,color='red')
+        axs102.plot(theta_arr,theta_arr*0,color='red',linestyle='dashed')
+        axs112 = axs[1,1].twinx()
+        axs[1,1].plot(theta_arr,b_arr,color='green')
+        axs[1,1].set_xlabel(r'$\theta$')
+        axs[1,1].set_ylabel(r'$B/B_0$')
+        axs[1,1].set_title('curvature drive')
+        axs[1,1].set_xlim((-np.pi,np.pi))
+        axs112.set_ylabel(r'$\frac{r}{B} \frac{\partial B}{\partial\rho} - \frac{r}{B_p} \frac{\partial B_p}{\partial\rho} - r/R_c $')
+        axs112.plot(theta_arr, -1.0* (rdbdrho - rdbpdrho - 1/Rc),color='red')
+        axs112.plot(theta_arr,theta_arr*0,color='red',linestyle='dashed')
+        plt.tight_layout()
+        plot_AE_per_bouncewell(theta_arr,b_arr,  rdbdrho  ,lam_arr,bw_list,ae_list,1.0)
 
-    fluxtube_vol = np.trapz(l_theta/bps,theta_arr) / MC.xi
+    fluxtube_vol = MC.xi_2 / MC.xi
 
     if L_ref == 'major':
         return np.sqrt(epsilon) * q**2.0 * np.trapz(AE_arr,lam_arr) / fluxtube_vol
@@ -141,4 +177,5 @@ def plot_AE_per_bouncewell(theta_arr,b_arr,dbdx_arr,lam_arr,bw,ae_list,n_pol):
     cbar.ax.set_xticklabels([0, round(max_val, 1)])
     plt.show()
 
-
+#       omn, eta, eps,  q,   kappa, delta, dR0dr, s_q, s_kappa, s_delta, alpha
+# calc_AE(3.0, 0.0, 0.18, 1.4, 1.0,   0.0,   0.0,   0.78, 0.0,     0.0,     0.0,theta_res=1000,lam_res=1000,del_sign=0.0,L_ref='major',rho=1.0,plot=True)

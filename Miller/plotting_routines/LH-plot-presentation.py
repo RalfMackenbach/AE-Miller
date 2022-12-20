@@ -15,42 +15,37 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 #rc('font',**{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)
 
-omn     = 1.0
+omn     = 'scan'
 eta     = 0.0
 epsilon = 1/3
-q       = 2.0
-kappa   = 1.5
-delta   = 0.25
-dR0dr   = -0.15
-s_q     = 'scan'
-s_kappa = 0.7
-s_delta = 0.25
-alpha   = 'scan'
+q       = 3.0
+kappa   = 2.0
+delta   = np.asarray([-0.7,0.7])
+dR0dr   = 0.0
+s_kappa = 0.0
+s_delta = 0.0
 theta_res   = int(1e2 +1)
-lam_res     = int(1e2)
+lam_res     = int(1e3)
 del_sign    = 0.0
-L_ref       = 'major'
+L_ref       = 'minor'
+
 
 
 
 def fmt(x, pos):
     a, b = '{:.1e}'.format(x).split('e')
     b = int(b)
-    if b != 0:
-        return r'${} \cdot 10^{{{}}}$'.format(a, b)
-    if b == 0:
-        return r'${}$'.format(a)
+    return r'${} \cdot 10^{{{}}}$'.format(a, b)
 
 
 
 # Construct grid for total integral
-s_grid          =  np.linspace(-2.0, +6.0, num=50, dtype='float64')
-alpha_grid      =  np.linspace(-0.5, +0.5, num=50, dtype='float64')
+omn_grid          =  np.linspace(0, 10, num=100, dtype='float64')
 
 
-sv, alphav = np.meshgrid(s_grid, alpha_grid, indexing='ij')
-AEv            = np.empty_like(sv)
-AEv_err        = np.empty_like(sv)
+omnv,  deltav  = np.meshgrid(omn_grid,delta)
+AEv            = np.empty_like(omnv)
+AEv_err        = np.empty_like(omnv)
 
 
 if __name__ == "__main__":
@@ -60,7 +55,7 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv)])
+    AE_list = pool.starmap(AEtok.calc_AE, [(omnv[idx],eta,epsilon,q,kappa,deltav[idx],dR0dr,2 - 2*omnv[idx]/10 ,s_kappa,s_delta, 2 * omnv[idx]/10,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()
@@ -73,9 +68,6 @@ if __name__ == "__main__":
         AEv[idx]    = AE_list[list_idx]
         list_idx    = list_idx + 1
 
-    np.save('AE_mat.npy', AEv)    # .npy extension is added if not given
-
-
     # theta = np.linspace(0,np.pi*2,theta_res)
     # f = plt.figure(1)
     # plt.plot(1 + epsilon*np.cos(theta + np.arcsin(delta)*np.sin(theta)), epsilon*kappa*np.sin(theta))
@@ -85,32 +77,32 @@ if __name__ == "__main__":
     # plt.ylabel(r'$Z/R_0$')
 
 
-    # levels = np.linspace(0, 4.0, 25)
+    # levels = np.linspace(0, 30, 25)
     # print(np.amax(AEv))
-    levels = np.linspace(0, np.amax(AE_list**(3/2)), 37)
-    fig = plt.figure(figsize=(3.375, 2.3)) #figsize=(6.850394, 3.0)
+    fig = plt.figure(figsize=(6, 2.0)) #figsize=(3.375, 2.3)
     ax  = fig.gca()
-    cnt = plt.contourf(alphav, sv, AEv**(3/2), levels=levels, cmap='plasma')
-    for c in cnt.collections:
-        c.set_edgecolor("face")
-    cbar = plt.colorbar(ticks=[0.0, np.amax(AE_list**(3/2))])
-    cbar.set_label(r'$\widehat{A}^{3/2}$')
-    # cbar.set_label(r'$\widehat{A}$')
-    cbar.solids.set_edgecolor("face")
+    cnt1 = plt.plot(omnv[1,:], AEv[1,:],'blue')
+    #cnt0 = plt.plot(omnv[0,:], AEv[0,:],'red',label=r'$\delta = -0.7$')
+    #plt.legend()
     # plt.title(r'Available Energy as a function of $s$ and $\alpha$' '\n' r'$\omega_n$={}, $\eta$={}, $\epsilon$={}, $q$={}, $d R_0/ d r$={}, $\kappa$={}, $s_\kappa$={}, $\delta$={}, $s_\delta$={}' '\n'.format(omn,eta,epsilon,q,dR0dr,kappa,s_kappa,delta,s_delta))
-    plt.xlabel(r'$\alpha$')
-    plt.ylabel(r'$s$')
-    # plt.text(3.2/4, -1.6, r'$(a)$',c='white')
+    plt.xlabel(r'$\nabla$ density')
+    plt.ylabel(r'available energy')
+    # plt.text(3.2, -1.6, r'$(b)$',c='white')
     ax.xaxis.set_tick_params(which='major', direction='in', top='on')
     ax.xaxis.set_tick_params(which='minor', direction='in', top='on')
     ax.yaxis.set_tick_params(which='major', direction='in', top='on')
     ax.yaxis.set_tick_params(which='minor', direction='in', top='on')
+    ax.grid(True)
+    aemax=np.amax(AEv)
+    #ax.text(1,25/30*aemax,r'$(c)$',horizontalalignment='center',verticalalignment='center')
     plt.tight_layout()
     # plt.subplots_adjust(left=0.15, right=0.88, top=0.96, bottom=0.14)
     plt.margins(0.1)
-    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/s-alpha/s-alpha.eps'.format(omn,eta,epsilon,q,kappa,delta,dR0dr,s_kappa,s_delta), format='eps',
+    plt.xlim((0,10))
+    plt.ylim(bottom=0.0)
+    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/LH/line_plot.png', format='png',
                 #This is recommendation for publication plots
-                dpi=1000,
+                dpi=2000,
                 # Plot will be occupy a maximum of available space
-                bbox_inches='tight')
+                bbox_inches='tight', pad_inches = 0.1)
     plt.show()

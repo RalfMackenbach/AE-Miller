@@ -18,19 +18,19 @@ rc('text', usetex=True)
 omn     = 'scan'
 res     = 100
 eta     = 0.0
-epsilon = 0.3
-q       = 2.0
-kappa   = 2.0
-delta   = -0.6
+epsilon = 0.1
+q       = 3.0
+kappa   = 1.0
+delta   = 0.0
 dR0dr   = 0.0
 s_q     = 0.0
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
 theta_res   = int(1e2 +1)
-lam_res     = int(1e4)
+lam_res     = int(1e3)
 del_sign    = 0.0
-L_ref       = 'minor'
+L_ref       = 'major'
 
 
 
@@ -72,23 +72,17 @@ if __name__ == "__main__":
         list_idx    = list_idx + 1
 
 
-    hlf = int(res/2)
+    # plt.loglog(omn_grid,AE_list)
+    # plt.loglog(omn_grid,AE_list[0]*(omn_grid/omn_grid[0])**(7/2),linestyle='dotted',color='black')
+    # plt.loglog(omn_grid,AE_list[-1]*(omn_grid/omn_grid[-1])**(1),linestyle='dotted',color='black')
+    # plt.axvline(x = crit_grad,color = 'r', linestyle='dashed')
+    # plt.ylabel('available energy')
+    # plt.xlabel('omn')
+    plt.plot(omn_grid,AE_list)
+    p=np.polyfit(omn_grid[-10::], AE_list[-10::], 1)
+    plt.plot(omn_grid,p[0]*omn_grid + p[1],linestyle='dotted',color='black')
+    print('crit grad is:', -p[1]/p[0])
 
-    # calc critical gradient
-    log_omns = np.log(omn_grid)
-    log_AE   = np.log(AE_list)
-    filter_fraction = 0.1
-    filter_window = int(int(res*filter_fraction/2)*2 + 1)
-    first_deriv  = list(savgol_filter(log_AE, filter_window, 3,deriv=1)/(log_omns[1]-log_omns[0]))
-    second_deriv = list(savgol_filter(log_AE, filter_window, 3,deriv=2)/(log_omns[1]-log_omns[0])**2.0)
-    min_value = min(second_deriv)
-    min_index = second_deriv.index(min_value)
-    crit_grad = omn_grid[min_index]
-    print(crit_grad)
-
-    plt.loglog(omn_grid,AE_list)
-    plt.axvline(x = crit_grad,color = 'r', linestyle='dashed')
-    plt.ylabel('available energy')
-    plt.xlabel('omn')
-
+    plt.ylim((0.0, AE_list[-1]/10))
+    plt.xlim((0.0, 10.0))
     plt.show()

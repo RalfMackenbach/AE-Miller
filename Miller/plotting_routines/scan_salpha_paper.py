@@ -26,10 +26,10 @@ s_q     = 'scan'
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 'scan'
-theta_res   = int(1e2 +1)
+theta_res   = int(1e2)
 lam_res     = int(1e3)
 del_sign    = 0.0
-L_ref       = 'minor'
+L_ref       = 'major'
 
 
 
@@ -37,7 +37,10 @@ L_ref       = 'minor'
 def fmt(x, pos):
     a, b = '{:.1e}'.format(x).split('e')
     b = int(b)
-    return r'${} \cdot 10^{{{}}}$'.format(a, b)
+    if b != 0:
+        return r'${} \cdot 10^{{{}}}$'.format(a, b)
+    if b == 0:
+        return r'${}$'.format(a)
 
 
 
@@ -102,15 +105,15 @@ if __name__ == "__main__":
     AE_max_1 = np.amax(AEv_1)
     AE_max_2 = np.amax(AEv_2)
     AE_max_3 = np.amax(AEv_3)
-    levels0 = np.linspace(0, AE_max_0**(3/2), 25)
-    levels1 = np.linspace(0, AE_max_1**(3/2), 25)
-    levels2 = np.linspace(0, AE_max_2**(3/2), 25)
-    levels3 = np.linspace(0, AE_max_3**(3/2), 25)
+    levels0 = np.linspace(0, AE_max_0, 25)
+    levels1 = np.linspace(0, AE_max_1, 25)
+    levels2 = np.linspace(0, AE_max_2, 25)
+    levels3 = np.linspace(0, AE_max_3, 25)
     fig, axs = plt.subplots(2,2, figsize=(6.850394, 5.0)) #figsize=(6.850394, 3.0)
-    cnt0 = axs[0,0].contourf(alphav, sv, AEv_0**(3/2), levels=levels0, cmap='plasma')
-    cnt1 = axs[0,1].contourf(alphav, sv, AEv_1**(3/2), levels=levels1, cmap='plasma')
-    cnt2 = axs[1,0].contourf(alphav, sv, AEv_2**(3/2), levels=levels2, cmap='plasma')
-    cnt3 = axs[1,1].contourf(alphav, sv, AEv_3**(3/2), levels=levels3, cmap='plasma')
+    cnt0 = axs[0,0].contourf(alphav, sv, AEv_0, levels=levels0, cmap='plasma')
+    cnt1 = axs[0,1].contourf(alphav, sv, AEv_1, levels=levels1, cmap='plasma')
+    cnt2 = axs[1,0].contourf(alphav, sv, AEv_2, levels=levels2, cmap='plasma')
+    cnt3 = axs[1,1].contourf(alphav, sv, AEv_3, levels=levels3, cmap='plasma')
     for c in cnt0.collections:
         c.set_edgecolor("face")
     for c in cnt1.collections:
@@ -119,13 +122,17 @@ if __name__ == "__main__":
         c.set_edgecolor("face")
     for c in cnt3.collections:
         c.set_edgecolor("face")
-    cbar0 = fig.colorbar(cnt0,ticks=[0.0, AE_max_0**(3/2)],ax=axs[0,0])
-    cbar1 = fig.colorbar(cnt1,ticks=[0.0, AE_max_1**(3/2)],ax=axs[0,1])
-    cbar2 = fig.colorbar(cnt2,ticks=[0.0, AE_max_2**(3/2)],ax=axs[1,0])
-    cbar3 = fig.colorbar(cnt3,ticks=[0.0, AE_max_3**(3/2)],ax=axs[1,1])
+    cbar0 = fig.colorbar(cnt0,ticks=[0.0, AE_max_0],ax=axs[0,0])
+    cbar0.set_ticklabels([r'$0$', fmt(AE_max_0,1)])
+    cbar1 = fig.colorbar(cnt1,ticks=[0.0, AE_max_1],ax=axs[0,1])
+    cbar1.set_ticklabels([r'$0$', fmt(AE_max_1,1)])
+    cbar2 = fig.colorbar(cnt2,ticks=[0.0, AE_max_2],ax=axs[1,0])
+    cbar2.set_ticklabels([r'$0$', fmt(AE_max_2,1)])
+    cbar3 = fig.colorbar(cnt3,ticks=[0.0, AE_max_3],ax=axs[1,1])
+    cbar3.set_ticklabels([r'$0$', fmt(AE_max_3,1)])
 
-    cbar1.set_label(r'$\widehat{A}^{3/2}$')
-    cbar3.set_label(r'$\widehat{A}^{3/2}$')
+    cbar1.set_label(r'$\widehat{A}$')
+    cbar3.set_label(r'$\widehat{A}$')
     # cbar.set_label(r'$\widehat{A}$')
     cbar0.solids.set_edgecolor("face")
     cbar1.solids.set_edgecolor("face")

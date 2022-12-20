@@ -105,6 +105,7 @@ def AE_func(omn,q,s,alpha,eta,epsilon=0.1,L_ref='minor'):
         int_val = np.asarray(quad(lambda k: integrand(k,s,alpha,q,omn,eta),  0, 1, limit=int(1e6)))
         return q**2 * epsilon**(5/2) * int_val
     if L_ref == 'major':
+        int_val = np.asarray(quad(lambda k: integrand(k,s,alpha,q,omn,eta),  0, 1, limit=int(1e6)))
         return q**2 * epsilon**(1/2) * int_val
 
 
@@ -132,13 +133,16 @@ if __name__ == "__main__":
     pool = mp.Pool(mp.cpu_count())
     print('Number of cores used: {}'.format(mp.cpu_count()))
 
-    omn = 0.003
-    epsilon = 0.001
+    omn = 3.0
+    epsilon = 1e-10
+    q_val = 2.0
+    eta = 0.0
+    L_ref = 'major'
 
     # time the full integral
     start_time = time.time()
-    AE_list0 = pool.starmap(AE_func, [(omn, 2.0, sv[idx], alphav[idx], 0.0, epsilon, 'minor') for idx, val in np.ndenumerate(sv)])
-    AE_list1 = pool.starmap(AEtok.calc_AE, [(omn,0.0,epsilon,2.0,1.0,0.0,0.0,sv[idx],0.0,0.0,alphav[idx],int(1e2),int(1e3),0.0,'minor') for idx, val in np.ndenumerate(sv)])
+    AE_list0 = pool.starmap(AE_func, [(omn, q_val, sv[idx], alphav[idx], eta, epsilon, L_ref) for idx, val in np.ndenumerate(sv)])
+    AE_list1 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,q_val,1.0,0.0,0.0,sv[idx],0.0,0.0,alphav[idx],int(1e3),int(1e3),0.0,L_ref) for idx, val in np.ndenumerate(sv)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()
@@ -157,11 +161,11 @@ if __name__ == "__main__":
     print('max AE s-alpha val is', np.amax(AEv0))
     print('max AE Miller val is', np.amax(AEv1))
     print('max err is', np.amax(rel_err))
+    print('min err is', np.amin(rel_err))
     print('mean err is',np.mean(rel_err))
 
     levels0 = np.linspace(0, np.amax(AEv0), 25)
     levels1 = np.linspace(0, np.amax(AEv1), 25)
-    levels2 = np.linspace(0, 0.03, 25)
 
     fig, axs = plt.subplots(1,3, figsize=(6.850394, 5.0/2)) #figsize=(6.850394, 3.0)
     cnt0 = axs[0].contourf(alphav, sv, AEv0, levels=levels0, cmap='plasma')
@@ -170,15 +174,17 @@ if __name__ == "__main__":
         c.set_edgecolor("face")
     for c in cnt1.collections:
         c.set_edgecolor("face")
+    vmin_err = np.floor(np.log10(np.amin(rel_err)))
+    vmax_err = np.floor(np.log10(np.amax(rel_err)))
     pcm = axs[2].pcolor(alphav, sv, rel_err,
-                   norm=colors.LogNorm(vmin=1e-5, vmax=1e-1),
+                   norm=colors.LogNorm(vmin=10**vmin_err, vmax=10**vmax_err),
                    cmap='Greys', shading='auto')
     pcm.set_edgecolor('face')
     cbar0 = fig.colorbar(cnt0,ticks=[0.0, np.amax(AEv0)],ax=axs[0],orientation="horizontal",pad=0.2)
     cbar1 = fig.colorbar(cnt1,ticks=[0.0, np.amax(AEv1)],ax=axs[1],orientation="horizontal",pad=0.2)
-    cbar2 = fig.colorbar(pcm, ax=axs[2],orientation="horizontal",pad=0.2)
-    cbar0.ax.set_xticklabels([r'$0$',r'$4.3 \times 10^{-7}$'])
-    cbar1.ax.set_xticklabels([r'$0$',r'$4.3 \times 10^{-7}$'])
+    cbar2 = fig.colorbar(pcm, ticks=[10**vmin_err,10**vmax_err], ax=axs[2],orientation="horizontal",pad=0.2)
+    cbar0.ax.set_xticklabels([r'$0$',fmt(np.amax(AEv0),1)])
+    cbar1.ax.set_xticklabels([r'$0$',fmt(np.amax(AEv1),1)])
     cbar0.solids.set_edgecolor("face")
     cbar1.solids.set_edgecolor("face")
     cbar2.solids.set_edgecolor("face")

@@ -19,9 +19,9 @@ from numba.extending import get_cython_function_address
 from numba import vectorize, njit
 import ctypes
 import sys
-wn_input = float(sys.argv[1])
-q_input  = float(sys.argv[2])
-eta_input= float(sys.argv[3])
+wn_input = 3.0
+q_input  = 2.0
+eta_input= 0.0
 
 
 Kaddr = get_cython_function_address("scipy.special.cython_special",    "ellipk")
@@ -156,8 +156,8 @@ if __name__ == "__main__":
     cbar.set_label(r'$\widehat{A}^{3/2}$')
     cbar.solids.set_edgecolor("face")
     plt.title(r'Available Energy as a function of $s$ and $\alpha$' '\n' r'$\omega_n$={}, $\eta$={}, $q$={},' '\n'.format(wn_input,eta_input,q_input))
-    plt.xlabel(r'$\alpha$')
-    plt.ylabel(r'$s$')
+    plt.xlabel('pressure gradient')
+    plt.ylabel('shear')
     # plt.text(3.2, -1.6, r'$(b)$',c='white')
     ax.xaxis.set_tick_params(which='major', direction='in', top='on')
     ax.xaxis.set_tick_params(which='minor', direction='in', top='on')

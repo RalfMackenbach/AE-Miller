@@ -165,43 +165,47 @@ def int_full(theta_arr,b_arr,f_arr,lam):
     for idx in range(0,len(t_wells)):
         wells_loc = t_wells[idx]
         wells_idx = idx_wells[idx]
+        l_idx = wells_idx[0]
+        r_idx = wells_idx[1]
+        l_val = wells_loc[0]
+        r_val = wells_loc[1]
         # check if integral goes over periodicity boundary,
         # if so split inner integral into two parts
-        if wells_loc[0]>wells_loc[1]:
+        if l_val>r_val:
             # create arrays for inner integral and do integral
-            thetai      = theta_arr[(wells_idx[0]+1):(-2)]
-            thetaj      = theta_arr[(wells_idx[0]+2):(-1)]
-            bi          = b_arr[(wells_idx[0]+1):(-2)]
-            bj          = b_arr[(wells_idx[0]+2):(-1)]
-            fi          = f_arr[(wells_idx[0]+1):(-2)]
-            fj          = f_arr[(wells_idx[0]+2):(-1)]
+            thetai      = theta_arr[(l_idx+1):(-1)]
+            thetaj      = theta_arr[(l_idx+2)::]
+            bi          = b_arr[(l_idx+1):(-1)]
+            bj          = b_arr[(l_idx+2)::]
+            fi          = f_arr[(l_idx+1):(-1)]
+            fj          = f_arr[(l_idx+2)::]
             inner_int_1 = np.sum(int_approx(thetai,thetaj,fi,fj,bi,bj,lam))
             # create arrays for inner integral and do integral
-            thetai      = theta_arr[0:(wells_idx[1])]
-            thetaj      = theta_arr[1:(wells_idx[1]+1)]
-            bi          = b_arr[0:(wells_idx[1])]
-            bj          = b_arr[1:(wells_idx[1]+1)]
-            fi          = f_arr[0:(wells_idx[1])]
-            fj          = f_arr[1:(wells_idx[1]+1)]
+            thetai      = theta_arr[0:(r_idx)]
+            thetaj      = theta_arr[1:(r_idx+1)]
+            bi          = b_arr[0:(r_idx)]
+            bj          = b_arr[1:(r_idx+1)]
+            fi          = f_arr[0:(r_idx)]
+            fj          = f_arr[1:(r_idx+1)]
             inner_int_2 = np.sum(int_approx(thetai,thetaj,fi,fj,bi,bj,lam))
             inner_int   = inner_int_1 + inner_int_2
         # otherwise, straightforward implementation
-        if wells_loc[0]<wells_loc[1]:
+        if l_val<r_val:
             # create arrays for inner integral and do integral
-            thetai    = theta_arr[(wells_idx[0]+1):(wells_idx[1])]
-            thetaj    = theta_arr[(wells_idx[0]+2):(wells_idx[1]+1)]
-            bi        = b_arr[(wells_idx[0]+1):(wells_idx[1])]
-            bj        = b_arr[(wells_idx[0]+2):(wells_idx[1]+1)]
-            fi        = f_arr[(wells_idx[0]+1):(wells_idx[1])]
-            fj        = f_arr[(wells_idx[0]+2):(wells_idx[1]+1)]
+            thetai    = theta_arr[(l_idx+1):(r_idx)]
+            thetaj    = theta_arr[(l_idx+2):(r_idx+1)]
+            bi        = b_arr[(l_idx+1):(r_idx)]
+            bj        = b_arr[(l_idx+2):(r_idx+1)]
+            fi        = f_arr[(l_idx+1):(r_idx)]
+            fj        = f_arr[(l_idx+2):(r_idx+1)]
             inner_int = np.sum(int_approx(thetai,thetaj,fi,fj,bi,bj,lam))
         # now the integrals at the edge
         # linear interpolation of f_i
-        fi          = f_arr[wells_idx[0]] + (wells_loc[0] - theta_arr[wells_idx[0]+1])/(theta_arr[wells_idx[0]] - theta_arr[wells_idx[0]+1]) * (f_arr[wells_idx[0]+1] - f_arr[wells_idx[0]])
-        left_int    = int_approx_left(wells_loc[0],theta_arr[wells_idx[0]+1],fi,f_arr[wells_idx[0]+1],0,b_arr[wells_idx[0]+1],lam)
+        fleft       = f_arr[l_idx] + (l_val - theta_arr[l_idx])/(theta_arr[l_idx+1] - theta_arr[l_idx]) * (f_arr[l_idx+1] - f_arr[l_idx])
+        left_int    = int_approx_left(l_val,theta_arr[l_idx+1],fleft,f_arr[l_idx+1],0.0,b_arr[l_idx+1],lam)
         # linear interpolation of f_j
-        fj          = f_arr[wells_idx[1]] + (wells_loc[1] - theta_arr[wells_idx[1]+1])/(theta_arr[wells_idx[1]] - theta_arr[wells_idx[1]+1]) * (f_arr[wells_idx[1]+1] - f_arr[wells_idx[1]])
-        right_int   = int_approx_right(theta_arr[wells_idx[1]],wells_loc[1],f_arr[wells_idx[1]],fj,b_arr[wells_idx[1]],0,lam)
+        fright      = f_arr[r_idx] + (r_val - theta_arr[r_idx])/(theta_arr[r_idx+1] - theta_arr[r_idx]) * (f_arr[r_idx+1] - f_arr[r_idx])
+        right_int   = int_approx_right(theta_arr[r_idx],r_val,f_arr[r_idx],fright,b_arr[r_idx],0.0,lam)
         # construct total in and append
         int_wells.append(left_int+inner_int+right_int)
 

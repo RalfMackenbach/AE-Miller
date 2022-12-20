@@ -15,7 +15,7 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 #rc('font',**{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)
 
-omn     = 3.0
+omn     = 1.0
 eta     = 0.0
 epsilon = 1/3
 q       = 2.0
@@ -27,9 +27,9 @@ s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
 theta_res   = int(1e2 +1)
-lam_res     = int(1e3)
+lam_res     = int(1e2)
 del_sign    = 0.0
-L_ref       = 'minor'
+L_ref       = 'major'
 
 
 
@@ -37,13 +37,16 @@ L_ref       = 'minor'
 def fmt(x, pos):
     a, b = '{:.1e}'.format(x).split('e')
     b = int(b)
-    return r'${} \cdot 10^{{{}}}$'.format(a, b)
+    if b != 0:
+        return r'${} \cdot 10^{{{}}}$'.format(a, b)
+    if b == 0:
+        return r'${}$'.format(a)
 
 
 
 # Construct grid for total integral
-kappa_grid      =  np.linspace(+0.5, +2.0, num=100, dtype='float64')
-delta_grid      =  np.linspace(-0.8, +0.8, num=100, dtype='float64')
+kappa_grid      =  np.linspace(+0.5, +2.0, num=10, dtype='float64')
+delta_grid      =  np.linspace(-0.8, +0.8, num=10, dtype='float64')
 
 
 kappav, deltav = np.meshgrid(kappa_grid, delta_grid, indexing='ij')
@@ -67,7 +70,7 @@ if __name__ == "__main__":
 
     AE_list_2 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,1.0, kappav[idx], deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_2)])
 
-    AE_list_3 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q, kappav[idx], deltav[idx],dR0dr,-1 ,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_3)])
+    AE_list_3 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q, kappav[idx], deltav[idx],dR0dr,2.0 ,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_3)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()
@@ -102,15 +105,15 @@ if __name__ == "__main__":
     AE_max_1 = np.amax(AEv_1)
     AE_max_2 = np.amax(AEv_2)
     AE_max_3 = np.amax(AEv_3)
-    levels0 = np.linspace(0, AE_max_0**(3/2), 25)
-    levels1 = np.linspace(0, AE_max_1**(3/2), 25)
-    levels2 = np.linspace(0, AE_max_2**(3/2), 25)
-    levels3 = np.linspace(0, AE_max_3**(3/2), 25)
+    levels0 = np.linspace(0, AE_max_0, 25)
+    levels1 = np.linspace(0, AE_max_1, 25)
+    levels2 = np.linspace(0, AE_max_2, 25)
+    levels3 = np.linspace(0, AE_max_3, 25)
     fig, axs = plt.subplots(2,2, figsize=(6.850394, 5.0)) #figsize=(6.850394, 3.0)
-    cnt0 = axs[0,0].contourf(kappav, deltav, AEv_0**(3/2), levels=levels0, cmap='plasma')
-    cnt1 = axs[0,1].contourf(kappav, deltav, AEv_1**(3/2), levels=levels1, cmap='plasma')
-    cnt2 = axs[1,0].contourf(kappav, deltav, AEv_2**(3/2), levels=levels2, cmap='plasma')
-    cnt3 = axs[1,1].contourf(kappav, deltav, AEv_3**(3/2), levels=levels3, cmap='plasma')
+    cnt0 = axs[0,0].contourf(kappav, deltav, AEv_0, levels=levels0, cmap='plasma')
+    cnt1 = axs[0,1].contourf(kappav, deltav, AEv_1, levels=levels1, cmap='plasma')
+    cnt2 = axs[1,0].contourf(kappav, deltav, AEv_2, levels=levels2, cmap='plasma')
+    cnt3 = axs[1,1].contourf(kappav, deltav, AEv_3, levels=levels3, cmap='plasma')
     for c in cnt0.collections:
         c.set_edgecolor("face")
     for c in cnt1.collections:
@@ -119,13 +122,17 @@ if __name__ == "__main__":
         c.set_edgecolor("face")
     for c in cnt3.collections:
         c.set_edgecolor("face")
-    cbar0 = fig.colorbar(cnt0,ticks=[0.0, AE_max_0**(3/2)],ax=axs[0,0])
-    cbar1 = fig.colorbar(cnt1,ticks=[0.0, AE_max_1**(3/2)],ax=axs[0,1])
-    cbar2 = fig.colorbar(cnt2,ticks=[0.0, AE_max_2**(3/2)],ax=axs[1,0])
-    cbar3 = fig.colorbar(cnt3,ticks=[0.0, AE_max_3**(3/2)],ax=axs[1,1])
+    cbar0 = fig.colorbar(cnt0,ticks=[0.0, AE_max_0],ax=axs[0,0])
+    cbar0.set_ticklabels([r'$0$', fmt(AE_max_0,1)])
+    cbar1 = fig.colorbar(cnt1,ticks=[0.0, AE_max_1],ax=axs[0,1])
+    cbar1.set_ticklabels([r'$0$', fmt(AE_max_1,1)])
+    cbar2 = fig.colorbar(cnt2,ticks=[0.0, AE_max_2],ax=axs[1,0])
+    cbar2.set_ticklabels([r'$0$', fmt(AE_max_2,1)])
+    cbar3 = fig.colorbar(cnt3,ticks=[0.0, AE_max_3],ax=axs[1,1])
+    cbar3.set_ticklabels([r'$0$', fmt(AE_max_3,1)])
 
-    cbar1.set_label(r'$\widehat{A}^{3/2}$')
-    cbar3.set_label(r'$\widehat{A}^{3/2}$')
+    cbar1.set_label(r'$\widehat{A}$')
+    cbar3.set_label(r'$\widehat{A}$')
     # cbar.set_label(r'$\widehat{A}$')
     cbar0.solids.set_edgecolor("face")
     cbar1.solids.set_edgecolor("face")
@@ -136,10 +143,10 @@ if __name__ == "__main__":
     axs[1,1].set_xlabel(r'$\kappa$')
     axs[0,0].set_ylabel(r'$\delta$')
     axs[1,0].set_ylabel(r'$\delta$')
-    axs[0,0].text(1.7, -0.6, r'$(a)$',c='white')
-    axs[0,1].text(1.7, -0.6, r'$(b)$',c='white')
-    axs[1,0].text(1.7, -0.6, r'$(c)$',c='white')
-    axs[1,1].text(1.7, -0.6, r'$(d)$',c='white')
+    axs[0,0].text(0.7, -0.6, r'$(a)$',c='white')
+    axs[0,1].text(0.7, -0.6, r'$(b)$',c='white')
+    axs[1,0].text(0.7, -0.6, r'$(c)$',c='white')
+    axs[1,1].text(0.7, -0.6, r'$(d)$',c='white')
     axs[0,0].xaxis.set_tick_params(which='major', direction='in', top='on')
     axs[0,0].xaxis.set_tick_params(which='minor', direction='in', top='on')
     axs[0,0].yaxis.set_tick_params(which='major', direction='in', top='on')

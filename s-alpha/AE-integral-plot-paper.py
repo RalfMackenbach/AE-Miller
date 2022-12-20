@@ -106,7 +106,10 @@ def AE_func(omn,q,s,alpha,eta,epsilon=0.1,L_ref='minor'):
 def fmt(x, pos):
     a, b = '{:.1e}'.format(x).split('e')
     b = int(b)
-    return r'${} \cdot 10^{{{}}}$'.format(a, b)
+    if b != 0:
+        return r'${} \cdot 10^{{{}}}$'.format(a, b)
+    if b == 0:
+        return r'${}$'.format(a)
 
 
 
@@ -145,21 +148,23 @@ if __name__ == "__main__":
         AEv1[idx]    = AE_list1[list_idx][0]
         list_idx = list_idx + 1
 
-    levels0 = np.linspace(0, np.amax(AEv0)**(3/2), 25)
-    levels1 = np.linspace(0, np.amax(AEv1)**(3/2), 25)
+    levels0 = np.linspace(0, np.amax(AEv0), 25)
+    levels1 = np.linspace(0, np.amax(AEv1), 25)
 
     fig, axs = plt.subplots(1,2, figsize=(6.850394, 5.0/2)) #figsize=(6.850394, 3.0)
-    cnt0 = axs[0].contourf(alphav, sv, AEv0**(3/2), levels=levels0, cmap='plasma')
-    cnt1 = axs[1].contourf(alphav, sv, AEv1**(3/2), levels=levels1, cmap='plasma')
+    cnt0 = axs[0].contourf(alphav, sv, AEv0, levels=levels0, cmap='plasma')
+    cnt1 = axs[1].contourf(alphav, sv, AEv1, levels=levels1, cmap='plasma')
     for c in cnt0.collections:
         c.set_edgecolor("face")
     for c in cnt1.collections:
         c.set_edgecolor("face")
-    cbar0 = fig.colorbar(cnt0,ticks=[0.0, np.amax(AEv0)**(3/2)],ax=axs[0])
-    cbar1 = fig.colorbar(cnt1,ticks=[0.0, np.amax(AEv1)**(3/2)],ax=axs[1])
+    cbar0 = fig.colorbar(cnt0,ticks=[0.0, np.amax(AEv0)],ax=axs[0])
+    cbar0.set_ticklabels([r'$0$',fmt(np.amax(AEv0),1)])
+    cbar1 = fig.colorbar(cnt1,ticks=[0.0, np.amax(AEv1)],ax=axs[1])
+    cbar1.set_ticklabels([r'$0$',fmt(np.amax(AEv1),1)])
     cbar0.solids.set_edgecolor("face")
     cbar1.solids.set_edgecolor("face")
-    cbar1.set_label(r'$\widehat{A}^{3/2}$')
+    cbar1.set_label(r'$\widehat{A}$')
     axs[0].set_xlabel(r'$\alpha$')
     axs[1].set_xlabel(r'$\alpha$')
     axs[0].set_ylabel(r'$s$')
