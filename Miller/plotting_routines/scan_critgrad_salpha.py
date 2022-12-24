@@ -98,8 +98,8 @@ if __name__ == "__main__":
         
 
     levels_arr=np.linspace(np.nanmin(crit_grad),np.nanmax(crit_grad),20)
-    plt.contourf(sv,alphav,crit_grad,levels=levels_arr,cmap='viridis_r')
+    plt.contourf(alphav,sv,crit_grad,levels=levels_arr,cmap='viridis_r')
     plt.colorbar(label=r'$L_{n,\mathrm{crit}}/R_0$')
-    plt.xlabel(r'$s$')
-    plt.ylabel(r'$\alpha$')
+    plt.xlabel(r'$\alpha$')
+    plt.ylabel(r'$s$')
     plt.show()

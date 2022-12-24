@@ -19,15 +19,15 @@ omn     = 'scan'
 eta     = 0.0
 epsilon = 1/3
 q       = 3.0
-kappa   = 2.0
-delta   = np.asarray([-0.7,0.7])
-dR0dr   = 0.0
-s_kappa = 0.0
+kappa   = 1.5
+delta   = np.asarray([-0.5,0.5])
+dR0dr   =-0.5
+s_kappa = 0.5
 s_delta = 0.0
-theta_res   = int(1e2 +1)
-lam_res     = int(1e4)
+theta_res   = int(1e3+1)
+lam_res     = int(1e3)
 del_sign    = 0.0
-L_ref       = 'minor'
+L_ref       = 'major'
 
 
 
@@ -40,7 +40,7 @@ def fmt(x, pos):
 
 
 # Construct grid for total integral
-omn_grid          =  np.linspace(0, 10, num=100, dtype='float64')
+omn_grid          =  np.linspace(0.0, 20.0, num=100, dtype='float64')
 
 
 omnv,  deltav  = np.meshgrid(omn_grid,delta)
@@ -55,7 +55,7 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list = pool.starmap(AEtok.calc_AE, [(omnv[idx],eta,epsilon,q,kappa,deltav[idx],dR0dr,2 - 2*omnv[idx]/10 ,s_kappa,s_delta, 2 * omnv[idx]/10,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv)])
+    AE_list = pool.starmap(AEtok.calc_AE, [(omnv[idx],eta,epsilon,q,kappa,deltav[idx],dR0dr,4*(1 - 0.25*omnv[idx]/omn_grid[-1]) ,s_kappa,deltav[idx]/(1-deltav[idx]**2)**0.5, 2 * omnv[idx]/omn_grid[-1],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()
@@ -81,11 +81,11 @@ if __name__ == "__main__":
     # print(np.amax(AEv))
     fig = plt.figure(figsize=(6, 2.0)) #figsize=(3.375, 2.3)
     ax  = fig.gca()
-    cnt1 = plt.plot(omnv[1,:], AEv[1,:],'blue',label=r'$\delta =+0.7$')
-    cnt0 = plt.plot(omnv[0,:], AEv[0,:],'red',label=r'$\delta = -0.7$')
+    cnt1 = plt.plot(omnv[1,:], AEv[1,:],'blue',label=r'$\delta =+0.5$')
+    cnt0 = plt.plot(omnv[0,:], AEv[0,:],'red',label=r'$\delta = -0.5$')
     plt.legend()
     # plt.title(r'Available Energy as a function of $s$ and $\alpha$' '\n' r'$\omega_n$={}, $\eta$={}, $\epsilon$={}, $q$={}, $d R_0/ d r$={}, $\kappa$={}, $s_\kappa$={}, $\delta$={}, $s_\delta$={}' '\n'.format(omn,eta,epsilon,q,dR0dr,kappa,s_kappa,delta,s_delta))
-    plt.xlabel(r'$\tilde{\omega}_n$')
+    plt.xlabel(r'$\hat{\omega}_n$')
     plt.ylabel(r'$\widehat{A}$')
     # plt.text(3.2, -1.6, r'$(b)$',c='white')
     ax.xaxis.set_tick_params(which='major', direction='in', top='on')
@@ -98,8 +98,9 @@ if __name__ == "__main__":
     plt.tight_layout()
     # plt.subplots_adjust(left=0.15, right=0.88, top=0.96, bottom=0.14)
     plt.margins(0.1)
-    plt.xlim((0,10))
-    plt.ylim(bottom=0.0)
+    plt.xlim((0,omn_grid[-1]))
+    plt.yscale('log')
+    plt.ylim(bottom=0.01)
     plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/LH/line_plot.png', format='png',
                 #This is recommendation for publication plots
                 dpi=2000,

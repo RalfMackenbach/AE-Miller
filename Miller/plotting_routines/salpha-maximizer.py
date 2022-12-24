@@ -19,19 +19,19 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 #rc('font',**{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)
 
-omn     = 3.0
+omn     = 1.0
 eta     = 0
 epsilon = 1/3
 q       = 2.0
-kappa   = 2.0
+kappa   = 1.5
 delta   = 0.0
-dR0dr   = 0.0
+dR0dr   =-0.5
 s_q     = 'scan'
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 'scan'
 theta_res   = int(1e2 +1)
-lam_res     = int(1e3)
+lam_res     = int(1e2)
 del_sign    = 0.0
 L_ref       = 'major'
 plot_steepest_descent = True
@@ -39,8 +39,8 @@ plot_steepest_descent = True
 
 
 
-resolution  = 101
-scan_arr    = np.linspace(-0.8,0.8,resolution)
+resolution  = 11
+scan_arr    = np.linspace(-0.5,0.5,resolution)
 s_arr       = np.empty_like(scan_arr)
 alpha_arr   = np.empty_like(scan_arr)
 AE_arr      = np.empty_like(scan_arr)

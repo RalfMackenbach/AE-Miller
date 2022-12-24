@@ -26,7 +26,7 @@ s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
 theta_res   = int(1e2)
-lam_res     = int(1e2)
+lam_res     = int(1e2+1)
 del_sign    = 0.0
 L_ref       = 'major'
 rho         = 1.0
@@ -41,8 +41,8 @@ def fmt(x, pos):
 
 
 # Construct grid for total integral
-eps_grid        =  np.linspace(1e-2,  3/4, num=100, dtype='float64')
-q_grid          =  np.linspace(1e-2,  2.0, num=100, dtype='float64')
+eps_grid        =  np.logspace(-3,  -1,  num=50, dtype='float64')
+q_grid          =  np.logspace(-2,   0,  num=50, dtype='float64')
 
 
 epsv, qv = np.meshgrid(eps_grid, q_grid, indexing='ij')
@@ -93,8 +93,8 @@ if __name__ == "__main__":
     ax.xaxis.set_tick_params(which='minor', direction='in', top='on')
     ax.yaxis.set_tick_params(which='major', direction='in', top='on')
     ax.yaxis.set_tick_params(which='minor', direction='in', top='on')
-    #ax.set_xscale('log')
-    #ax.set_yscale('log')
+    ax.set_xscale('log')
+    ax.set_yscale('log')
     plt.tight_layout()
     # plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plot_geom_wn={}_eta={}_eps={}_q={}_sq={}_dR0dr={}_skappa={}_sdelta={}_alpha={}.eps'.format(omn,eta,epsilon,q,s_q,dR0dr,s_kappa,s_delta,alpha), format='eps',
     #             #This is recommendation for publication plots

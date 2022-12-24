@@ -16,7 +16,7 @@ rc('text', usetex=True)
 
 omn     = 1.0
 eta     = 0.0
-epsilon = 1/3
+epsilon = 0.8
 q       = 3.0
 kappa   = 'scan'
 delta   = 'scan'
@@ -25,8 +25,8 @@ s_q     = 0.0
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
-theta_res   = int(1e2+1)
-lam_res     = int(1e2)
+theta_res   = int(1e3+1)
+lam_res     = int(1e3)
 del_sign    = 0.0
 L_ref       = 'minor'
 rho         = 1.0
@@ -41,8 +41,8 @@ def fmt(x, pos):
 
 
 # Construct grid for total integral
-kappa_grid      =  np.linspace(+0.5, +2.0, num=30, dtype='float64')
-delta_grid      =  np.linspace(-0.5, +0.5, num=30, dtype='float64')
+kappa_grid      =  np.linspace(+0.5, +2.0, num=20, dtype='float64')
+delta_grid      =  np.linspace(-0.5, +0.5, num=20, dtype='float64')
 
 
 kappav, deltav = np.meshgrid(kappa_grid, delta_grid, indexing='ij')

@@ -100,6 +100,7 @@ def AE_func(omn,q,s,alpha,eta,epsilon=0.1,L_ref='minor'):
         int_val = np.asarray(quad(lambda k: integrand(k,s,alpha,q,omn,eta),  0, 1, limit=int(1e6)))
         return q**2 * epsilon**(5/2) * int_val
     if L_ref == 'major':
+        int_val = np.asarray(quad(lambda k: integrand(k,s,alpha,q,omn,eta),  0, 1, limit=int(1e6)))
         return q**2 * epsilon**(1/2) * int_val
 
 
@@ -132,8 +133,8 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list0 = pool.starmap(AE_func, [(1.0, 0.5, sv[idx], alphav[idx], 0.0, 1/3, 'minor') for idx, val in np.ndenumerate(sv)])
-    AE_list1 = pool.starmap(AE_func, [(1.0, 2.0, sv[idx], alphav[idx], 0.0, 1/3, 'minor') for idx, val in np.ndenumerate(sv)])
+    AE_list0 = pool.starmap(AE_func, [(1.0, 0.5, sv[idx], alphav[idx], 0.0, 1/3, 'major') for idx, val in np.ndenumerate(sv)])
+    AE_list1 = pool.starmap(AE_func, [(1.0, 2.0, sv[idx], alphav[idx], 0.0, 1/3, 'major') for idx, val in np.ndenumerate(sv)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()

@@ -134,7 +134,7 @@ if __name__ == "__main__":
     print('Number of cores used: {}'.format(mp.cpu_count()))
 
     omn = 3.0
-    epsilon = 1e-10
+    epsilon = 1e-6
     q_val = 2.0
     eta = 0.0
     L_ref = 'major'
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     # time the full integral
     start_time = time.time()
     AE_list0 = pool.starmap(AE_func, [(omn, q_val, sv[idx], alphav[idx], eta, epsilon, L_ref) for idx, val in np.ndenumerate(sv)])
-    AE_list1 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,q_val,1.0,0.0,0.0,sv[idx],0.0,0.0,alphav[idx],int(1e3),int(1e3),0.0,L_ref) for idx, val in np.ndenumerate(sv)])
+    AE_list1 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,q_val,1.0,0.0,0.0,sv[idx],0.0,0.0,alphav[idx],int(1e3+1),int(1e3),0.0,L_ref) for idx, val in np.ndenumerate(sv)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()

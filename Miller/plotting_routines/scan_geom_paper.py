@@ -26,8 +26,8 @@ s_q     = 0.0
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
-theta_res   = int(1e2 +1)
-lam_res     = int(1e2)
+theta_res   = int(1e3 +1)
+lam_res     = int(1e3)
 del_sign    = 0.0
 L_ref       = 'major'
 
@@ -45,8 +45,8 @@ def fmt(x, pos):
 
 
 # Construct grid for total integral
-kappa_grid      =  np.linspace(+0.5, +2.0, num=10, dtype='float64')
-delta_grid      =  np.linspace(-0.8, +0.8, num=10, dtype='float64')
+kappa_grid      =  np.linspace(+0.5, +2.0, num=25, dtype='float64')
+delta_grid      =  np.linspace(-0.8, +0.8, num=25, dtype='float64')
 
 
 kappav, deltav = np.meshgrid(kappa_grid, delta_grid, indexing='ij')

@@ -19,15 +19,15 @@ omn     = 1.0
 eta     = 0.0
 epsilon = 1/3
 q       = 2.0
-kappa   = 1.7
+kappa   = 1.5
 delta   = 0.5
 dR0dr   = 0.0
 s_q     = 'scan'
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 'scan'
-theta_res   = int(1e2)
-lam_res     = int(1e3)
+theta_res   = int(1e2+1)
+lam_res     = int(1e2)
 del_sign    = 0.0
 L_ref       = 'major'
 
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     start_time = time.time()
     AE_list_0 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q, kappa, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_0)])
 
-    AE_list_1 = pool.starmap(AEtok.calc_AE, [(omn,eta,    2/3,  q, kappa, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_1)])
+    AE_list_1 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon, 1.0, kappa, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_1)])
 
     AE_list_2 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q,   0.5, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_2)])
 

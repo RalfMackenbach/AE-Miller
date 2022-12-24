@@ -14,18 +14,18 @@ omn     = 'scan'
 eta     = 0.0
 epsilon = 1/3
 q       = 3.0
-kappa   = 2.0
-delta   = -0.7
-dR0dr   = 0.0
-s_kappa = 0.0
-s_delta = 0.0
-theta_res   = int(1e2 +1)
+kappa   = 1.5
+delta   =+0.5
+dR0dr   =-0.5
+s_kappa = 0.5
+s_delta = delta/np.sqrt(1-delta**2)
+theta_res   = int(1e2+1)
 lam_res     = int(1e2)
 del_sign    = 0.0
-L_ref       = 'minor'
+L_ref       = 'major'
 
 
-
+res = 30
 
 
 def fmt(x, pos):
@@ -77,9 +77,9 @@ def plot_contour3d(self, **kwargs):
 
 
 # Construct grid for total integral
-omn_grid          =  np.linspace(+1.0,+10.0, num=100, dtype='float64')
-s_grid            =  np.linspace(+0.0, +2.0, num=100, dtype='float64')
-alpha_grid        =  np.linspace(+0.0, +2.0, num=100, dtype='float64')
+omn_grid          =  np.linspace(+0.0,+20.0, num=res, dtype='float64')
+s_grid            =  np.linspace(+4.0, +3.0, num=res, dtype='float64')
+alpha_grid        =  np.linspace(+0.0, +2.0, num=res, dtype='float64')
 
 
 omnv, sv, alphav  = np.meshgrid(omn_grid,s_grid,alpha_grid)
