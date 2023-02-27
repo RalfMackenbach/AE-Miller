@@ -16,21 +16,20 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 rc('text', usetex=True)
 
 omn_fac = 1e2
-omn1 = omn_fac*1.0
-omn2 = omn_fac*5.0
-omn3 = omn_fac*10.0
+omn1 = 1e-3
+omn2 = 1e3
 eta     = 0.0
-epsilon = 1e-4
+epsilon = 1/3
 q       = 2.0
-kappa   = 1.0
+kappa   = 1.5
 delta   = 0.5
 dR0dr   = 0.0
 s_q     = 0.0
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
-theta_res   = int(1e2 +1)
-lam_res     = int(1e2)
+theta_res   = int(1e4 +1)
+lam_res     = int(1e4)
 del_sign    = 0.0
 L_ref       = 'major'
 
@@ -76,48 +75,39 @@ if __name__ == "__main__":
     start_time = time.time()
     AE_sa_1 = pool.starmap(AEtok.calc_AE, [(omn1,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEsa1)])
     AE_sa_2 = pool.starmap(AEtok.calc_AE, [(omn2,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEsa2)])
-    AE_sa_3 = pool.starmap(AEtok.calc_AE, [(omn3,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEsa3)])
     AE_kd_1 = pool.starmap(AEtok.calc_AE, [(omn1,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEkd1)])
     AE_kd_2 = pool.starmap(AEtok.calc_AE, [(omn2,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEkd2)])
-    AE_kd_3 = pool.starmap(AEtok.calc_AE, [(omn3,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEkd3)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
-    pool.close()
+    
     list_idx = 0
     for idx, val in np.ndenumerate(AEsa1):
         AEsa1[idx]   = AE_sa_1[list_idx]
         AEsa2[idx]   = AE_sa_2[list_idx]
-        AEsa3[idx]   = AE_sa_3[list_idx]
         list_idx    = list_idx + 1
 
     list_idx = 0
     for idx, val in np.ndenumerate(AEkd1):
         AEkd1[idx]   = AE_kd_1[list_idx]
         AEkd2[idx]   = AE_kd_2[list_idx]
-        AEkd3[idx]   = AE_kd_3[list_idx]
         list_idx    = list_idx + 1
     
     # fit 
     for idx, _ in np.ndenumerate(critgrad_sa):
-        p=np.polyfit(np.asarray([omn1,omn2,omn3]), np.asarray([AEsa1[idx],AEsa2[idx],AEsa3[idx]]), 1)
-        if p[0] != 0:
-            critgrad_sa[idx] =  -p[1]/p[0]
-        else: 
-            critgrad_sa[idx] =  np.nan
+        intersection = np.sqrt(AEsa2[idx]/AEsa1[idx])*np.sqrt(omn1/omn2)*omn1
+        critgrad_sa[idx] =  intersection
 
     for idx, _ in np.ndenumerate(critgrad_kd):
-        p=np.polyfit(np.asarray([omn1,omn2,omn3]), np.asarray([AEkd1[idx],AEkd2[idx],AEkd3[idx]]), 1)
-        if p[0] != 0:
-            critgrad_kd[idx] =  -p[1]/p[0]
-        else: 
-            critgrad_kd[idx] =  np.nan
+        intersection = np.sqrt(AEkd2[idx]/AEkd1[idx])*np.sqrt(omn1/omn2)*omn1
+        critgrad_kd[idx] =  intersection
 
-    maxsa = np.nanmax(critgrad_sa)
-    maxkd = np.nanmax(critgrad_kd)
-    minsa = np.nanmin(critgrad_sa)
-    minkd = np.nanmin(critgrad_kd)
-    max  = np.nanmax([maxsa,maxkd])
-    min  = np.nanmin([minsa,minkd])
-    #print(maxsa,minsa,maxkd,minkd)
+    pool.close()
+
+    maxsa = np.amax(critgrad_sa)
+    maxkd = np.amax(critgrad_kd)
+    minsa = np.amin(critgrad_sa)
+    minkd = np.amin(critgrad_kd)
+    max  = np.amax([maxsa,maxkd])
+    min  = np.amin([minsa,minkd])
     levelssa = np.linspace(minsa,maxsa,20)
     levelskd = np.linspace(minkd,maxkd,20)
     fig, axs = plt.subplots(1,2, figsize=(6.850394, 5.0/2)) #figsize=(6.850394, 3.0)
