@@ -1,14 +1,10 @@
-import sys
-sys.path.insert(1, '/Users/ralfmackenbach/Documents/GitHub/AE-tok/Miller/scripts')
+import AEtok.AE_tokamak_calculation as AEtok
 import numpy as np
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
-import h5py
 import matplotlib        as mpl
-import AE_tokamak_calculation as AEtok
 from matplotlib import rc
-import Miller_functions as Mf
 import matplotlib.ticker as ticker
 from matplotlib.colors import LogNorm
 import matplotlib.colors as mcolors
@@ -28,33 +24,27 @@ s_q     = 0.0
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
-theta_res   = int(1e2)
-lam_res     = int(1e2+1)
-del_sign    = 0.0
+theta_res   = int(1e3)
+lam_res     = int(1e3+1)
 L_ref       = 'major'
+res = 10
 
 
 
 
-def fmt(x, pos):
-    a, b = '{:.1e}'.format(x).split('e')
-    b = int(b)
-    if b != 0:
-        return r'${} \cdot 10^{{{}}}$'.format(a, b)
-    if b == 0:
-        return r'${}$'.format(a)
 
 
-res = 100
+
+
 # Construct grid for total integral
 s_grid          =  np.linspace(-1.0, +4.0, num=res, dtype='float64')
 alpha_grid      =  np.linspace(+0.0, +0.5, num=res, dtype='float64')
 omn_grid        =  np.logspace(-1.0, +1.0, num=res, dtype='float64')
-q_grid        =  np.linspace(+1.0,   +4.0, num=res, dtype='float64')
+eta_grid        =  np.linspace(+0.0, +4/3, num=res, dtype='float64')
 
 
 sv, alphav = np.meshgrid(s_grid, alpha_grid, indexing='ij')
-omnv, qv = np.meshgrid(omn_grid, q_grid, indexing='ij')
+omnv, etav = np.meshgrid(omn_grid, eta_grid, indexing='ij')
 AEv_neg_0       = np.empty_like(sv)
 AEv_neg_1       = np.empty_like(sv)
 AEv_neg_2       = np.empty_like(sv)
@@ -75,10 +65,10 @@ if __name__ == "__main__":
 
     for delta in [-delta_bound,delta_bound]:
         start_time = time.time()            #    omn,eta,epsilon,q,kappa,delta,dR0dr,s_q[idx],s_kappa[idx],s_delta[idx],alpha[idx],theta_res,lam_res,del_sign,L_ref
-        AE_list0 = pool.starmap(AEtok.calc_AE, [(0.5,eta,1e-2, 1.0,1.5  ,delta, 0.0 ,sv[idx],    0.0,     0.1*delta/np.sqrt(1-delta**2),alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_neg_0)])
-        AE_list1 = pool.starmap(AEtok.calc_AE, [(2.0,eta,1/3 , 3.0,1.5  ,delta,-0.5 ,sv[idx],    0.5,     0.1*delta/np.sqrt(1-delta**2),alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_neg_1)])
-        AE_list2 = pool.starmap(AEtok.calc_AE, [(omnv[idx],eta,1e-2,qv[idx],1.5,delta, 0.0,0.0,0.0,0.1*delta/np.sqrt(1-delta**2),0.0,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_neg_2)])
-        AE_list3 = pool.starmap(AEtok.calc_AE, [(omnv[idx],eta,1/3 ,qv[idx],1.5,delta,-0.5,3.0,0.5,0.1*delta/np.sqrt(1-delta**2),0.5,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_neg_3)])
+        AE_list0 = pool.starmap(AEtok.calc_AE, [(0.5,eta,1e-2, 1.0,1.5  ,delta, 0.0 ,sv[idx],    0.0,     0.0,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv_neg_0)])
+        AE_list1 = pool.starmap(AEtok.calc_AE, [(2.0,eta,1/3 , 3.0,1.5  ,delta,-0.5 ,sv[idx],    0.5,     0.0,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv_neg_1)])
+        AE_list2 = pool.starmap(AEtok.calc_AE, [(omnv[idx],etav[idx],1e-2,1.0,1.5,delta, 0.0,0.0,0.0,0.0,0.0,theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv_neg_2)])
+        AE_list3 = pool.starmap(AEtok.calc_AE, [(omnv[idx],etav[idx],1/3 ,3.0,1.5,delta,-0.5,2.0,0.5,0.0,0.5,theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv_neg_3)])
         print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
         # reorder data full int
@@ -102,10 +92,10 @@ if __name__ == "__main__":
 
     pool.close()
 
-    delta_0 = np.log(AEv_neg_0/AEv_pos_0)
-    delta_1 = np.log(AEv_neg_1/AEv_pos_1)
-    delta_2 = np.log(AEv_neg_2/AEv_pos_2)
-    delta_3 = np.log(AEv_neg_3/AEv_pos_3)
+    delta_0 = np.log10(AEv_neg_0/AEv_pos_0)
+    delta_1 = np.log10(AEv_neg_1/AEv_pos_1)
+    delta_2 = np.log10(AEv_neg_2/AEv_pos_2)
+    delta_3 = np.log10(AEv_neg_3/AEv_pos_3)
 
     fig, axs = plt.subplots(2,2, figsize=(6.850394, 5.0)) #figsize=(6.850394, 3.0)
     max_0 = np.nanmax([np.nanmax(delta_0),-np.nanmin(delta_0)])
@@ -124,10 +114,13 @@ if __name__ == "__main__":
     cnl0 = axs[0,0].contour (alphav, sv, delta_0, [0.0],cmap='gray')
     cnt1 = axs[0,1].contourf(alphav, sv, delta_1, levels=levels1, cmap='bwr')
     cnl1 = axs[0,1].contour (alphav, sv, delta_1, [0.0],cmap='gray')
-    cnt2 = axs[1,0].contourf(qv, omnv, delta_2, levels=levels2, cmap='bwr')
-    cnl2 = axs[1,0].contour (qv, omnv, delta_2, [0.0],cmap='gray')
-    cnt3 = axs[1,1].contourf(qv, omnv, delta_3, levels=levels3, cmap='bwr')
-    cnl3 = axs[1,1].contour (qv, omnv, delta_3, [0.0],cmap='gray')
+    cnt2 = axs[1,0].contourf(etav, omnv, delta_2, levels=levels2, cmap='bwr')
+    cnl2 = axs[1,0].contour (etav, omnv, delta_2, [0.0],cmap='gray')
+    cnt3 = axs[1,1].contourf(etav, omnv, delta_3, levels=levels3, cmap='bwr')
+    cnl3 = axs[1,1].contour (etav, omnv, delta_3, [0.0],cmap='gray')
+    # mask = np.isfinite(delta_3) | np.isfinite(delta_3)
+    # mask = np.multiply(mask, 1)
+    # cnlinf = axs[1,1].contour (etav, omnv, mask,[0.5],cmap='gray',linestyles='dotted')
     axs[1,1].set_yscale('log')
     axs[1,0].set_yscale('log')
 
@@ -135,6 +128,12 @@ if __name__ == "__main__":
     axs[0,1].clabel(cnl1)
     axs[1,0].clabel(cnl2)
     axs[1,1].clabel(cnl3)
+    # strs = [r'$\Delta = 0$']
+    # fmt = {}
+    # for l, s in zip(cnlinf.levels, strs):
+    #     fmt[l] = s
+    # stablelabel= axs[1,1].clabel(cnlinf,cnlinf.levels,fmt=fmt,rightside_up=True)
+    
 
 
     for c in cnt0.collections:
@@ -164,14 +163,18 @@ if __name__ == "__main__":
     # plt.title(r'Available Energy as a function of $s$ and $\alpha$' '\n' r'$\omega_n$={}, $\eta$={}, $\epsilon$={}, $q$={}, $d R_0/ d r$={}, $\kappa$={}, $s_\kappa$={}, $\delta$={}, $s_\delta$={}' '\n'.format(omn,eta,epsilon,q,dR0dr,kappa,s_kappa,delta,s_delta))
     axs[0,1].set_xlabel(r'$\alpha$')
     axs[0,0].set_xlabel(r'$\alpha$')
-    axs[1,0].set_xlabel(r'$q$')
-    axs[1,1].set_xlabel(r'$q$')
+    axs[1,0].set_xlabel(r'$\eta$')
+    axs[1,1].set_xlabel(r'$\eta$')
     axs[0,0].set_ylabel(r'$s$')
     axs[1,0].set_ylabel(r'$\hat{\omega}_n$')
+    axs[1,0].set_xticks([0,2/3,4/3])
+    axs[1,1].set_xticks([0,2/3,4/3])
+    axs[1,0].set_xticklabels([r'$0$',r'$2/3$',r'$4/3$'])
+    axs[1,1].set_xticklabels([r'$0$',r'$2/3$',r'$4/3$'])
     axs[0,0].text(0.05, 3.4, r'$(a)$',c='black',va='center',ha='center')
     axs[0,1].text(0.05, 3.4, r'$(b)$',c='black',va='center',ha='center')
-    axs[1,0].text(1.3,  6.0, r'$(c)$',c='black',va='center',ha='center')
-    axs[1,1].text(1.3,  6.0, r'$(d)$',c='black',va='center',ha='center')
+    axs[1,0].text((4/3)/10,  6.0, r'$(c)$',c='black',va='center',ha='center')
+    axs[1,1].text((4/3)/10,  6.0, r'$(d)$',c='black',va='center',ha='center')
     axs[0,0].xaxis.set_tick_params(which='major', direction='in', top='on')
     axs[0,0].xaxis.set_tick_params(which='minor', direction='in', top='on')
     axs[0,0].yaxis.set_tick_params(which='major', direction='in', top='on')
@@ -192,6 +195,7 @@ if __name__ == "__main__":
     axs[1,1].set_yticklabels([])
     axs[0,0].set_title(r'$\mathrm{core}$')
     axs[0,1].set_title(r'$\mathrm{edge}$')
+    
     plt.tight_layout()
     plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/s-alpha/delta_paper.eps', format='eps',
                 #This is recommendation for publication plots

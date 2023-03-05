@@ -1,12 +1,9 @@
-import sys
-sys.path.insert(1, '/Users/ralfmackenbach/Documents/GitHub/AE-tok/Miller/scripts')
+import AEtok.AE_tokamak_calculation as AEtok
 import numpy as np
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
-import h5py
 import matplotlib        as mpl
-import AE_tokamak_calculation as AEtok
 from matplotlib import rc
 import matplotlib.ticker as ticker
 from    scipy.signal        import  savgol_filter
@@ -21,9 +18,9 @@ omn2 = omn_fac*5.0
 omn3 = omn_fac*10.0
 eta     = 0.0
 epsilon = 1/3
-q       = 3.0
-kappa   = 1.0
-delta   = 0.0
+q       = 2.0
+kappa   = 2.0
+delta   =-0.8
 dR0dr   = 0.0
 s_q     = 0.0
 s_kappa = 0.0
@@ -31,7 +28,6 @@ s_delta = 0.0
 alpha   = 0.0
 theta_res   = int(1e2 +1)
 lam_res     = int(1e2)
-del_sign    = 0.0
 L_ref       = 'major'
 
 
@@ -66,9 +62,9 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list_1 = pool.starmap(AEtok.calc_AE, [(omn1,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv1)])
-    AE_list_2 = pool.starmap(AEtok.calc_AE, [(omn2,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv2)])
-    AE_list_3 = pool.starmap(AEtok.calc_AE, [(omn3,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv3)])
+    AE_list_1 = pool.starmap(AEtok.calc_AE, [(omn1,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv1)])
+    AE_list_2 = pool.starmap(AEtok.calc_AE, [(omn2,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv2)])
+    AE_list_3 = pool.starmap(AEtok.calc_AE, [(omn3,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv3)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
     
     list_idx = 0

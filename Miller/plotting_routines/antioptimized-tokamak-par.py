@@ -1,14 +1,11 @@
-import sys
-sys.path.insert(1, '/Users/ralfmackenbach/Documents/GitHub/AE-tok/Miller/scripts')
+import AEtok.AE_tokamak_calculation as AEtok
 import numpy as np
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
 import h5py
 import matplotlib        as mpl
-import AE_tokamak_calculation as AEtok
 from matplotlib import rc
-import Miller_functions as Mf
 import matplotlib.ticker as ticker
 import scipy
 import matplotlib.cm as cm
@@ -26,10 +23,11 @@ q       = 3.0
 dR0dr   =-0.5
 s_kappa = 0.0
 s_delta = 0.0
-theta_res   = int(1e2)
-lam_res     = int(1e2+1)
-del_sign    = 0.0
-L_ref       = 'major'
+theta_res   = int(1e3+1)
+lam_res     = int(1e3)
+L_ref       = 'minor'
+A = 3.0
+rho = 1.0
 s_min = -1.0
 s_max = +4.0
 alpha_min = 0.0
@@ -38,7 +36,7 @@ kappa_min = 0.5
 kappa_max = 2.0
 delta_min =-0.5
 delta_max = 0.5
-res = 20
+res = 2
 
 s_grid          =   np.linspace(s_min, s_max, num=res, dtype='float64')
 alpha_grid      =   np.linspace(alpha_min, alpha_max, num=res, dtype='float64')
@@ -55,8 +53,8 @@ def fmt(x, pos):
     return r'${} \cdot 10^{{{}}}$'.format(a, b)
 
 def opt_func(s_q,alpha):
-    fun = lambda x: -1.0*AEtok.calc_AE(omn,eta,epsilon,  q,x[0], x[1],dR0dr, s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref)
-    res = scipy.optimize.shgo(fun,bounds=((kappa_min,kappa_max),(delta_min,delta_max)),options={'disp': True} )
+    fun = lambda x: -1*AEtok.calc_AE(omn,eta,epsilon,  q,x[0], x[1],dR0dr, s_q,s_kappa,s_delta,alpha,theta_res,lam_res,L_ref,A,rho)
+    res = scipy.optimize.shgo(fun,bounds=((kappa_min,kappa_max),(delta_min,delta_max)),options={'disp': False} )
     return res
 
 if __name__ == "__main__":
@@ -85,9 +83,9 @@ if __name__ == "__main__":
     fig, axs = plt.subplots(1,4, figsize=(6.850394, 5.0/2)) #figsize=(6.850394, 3.0)
     pAE         = axs[0].pcolor(alphav,sv,AE_opt,cmap='plasma')
     pAE.set_edgecolor('face')
-    cbarae   = fig.colorbar(pAE, ticks=[np.amin(AE_opt),np.amax(AE_opt)], ax=axs[0],orientation="horizontal",pad=0.3,label=r'$\widehat{A}$')
+    cbarae   = fig.colorbar(-1*pAE, ticks=[np.amin(AE_opt),np.amax(AE_opt)], ax=axs[0],orientation="horizontal",pad=0.3,label=r'$\widehat{A}$')
     cbarae.set_ticks(ticks=[np.amin(AE_opt),np.amax(AE_opt)])
-    cbarae.set_ticklabels([fmt(np.amin(AE_opt),1),fmt(np.amax(AE_opt),1)])
+    cbarae.set_ticklabels([fmt(np.amin(-1*AE_opt),1),fmt(np.amax(-1*AE_opt),1)])
     pkappa      = axs[1].pcolor(alphav,sv,kappa_opt,cmap='viridis')
     pkappa.set_edgecolor('face')
     cbarkappa   = fig.colorbar(pkappa, ticks=[kappa_min,kappa_max], ax=axs[1],orientation="horizontal",pad=0.3,label=r'$\kappa$')
@@ -103,8 +101,7 @@ if __name__ == "__main__":
     pcat        = axs[3].pcolor(alphav,sv,cat,cmap=cmap,norm=norm)
     pcat.set_edgecolor('face')
     cbarcat     = fig.colorbar(pcat, ax=axs[3],orientation="horizontal",pad=0.3)
-    cbarcat.set_ticks(ticks=[0.5,1.5,2.5,3.5],length=0.0)
-    cbarcat.set_ticklabels([r'$\mathrm{NC}$',r'$\mathrm{NT}$',r'$\mathrm{PT}$',r'$\mathrm{PC}$'])
+    cbarcat.set_ticks(ticks=[0.5,1.5,2.5,3.5],labels=[r'$\mathrm{NC}$',r'$\mathrm{NT}$',r'$\mathrm{PT}$',r'$\mathrm{PC}$'])
 
     axs[0].set_ylabel(r'$s$')
     axs[0].set_xlabel(r'$\alpha$')
@@ -124,7 +121,7 @@ if __name__ == "__main__":
     axs[2].text(0.8,-0.5,r'$(c)$')
     axs[3].text(0.8,-0.5,r'$(d)$')
     plt.tight_layout()
-    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/optimisation/antioptimized-triptych.eps', format='eps',
+    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/optimisation/optimized-triptych.eps', format='eps',
                 #This is recommendation for publication plots
                 dpi=1000,
                 # Plot will be occupy a maximum of available space

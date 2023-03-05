@@ -1,12 +1,9 @@
-import sys
-sys.path.insert(1, '/Users/ralfmackenbach/Documents/GitHub/AE-tok/Miller/scripts')
+import AEtok.AE_tokamak_calculation as AEtok
 import numpy as np
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
-import h5py
 import matplotlib        as mpl
-import AE_tokamak_calculation as AEtok
 from matplotlib import rc
 import matplotlib.ticker as ticker
 from    scipy.signal        import  savgol_filter
@@ -29,7 +26,6 @@ s_delta = 0.0
 alpha   = 0.0
 theta_res   = int(1e2 +1)
 lam_res     = int(1e2)
-del_sign    = 0.0
 L_ref       = 'major'
 
 
@@ -64,9 +60,9 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list_1 = pool.starmap(AEtok.calc_AE, [(omn1,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv1)])
-    AE_list_2 = pool.starmap(AEtok.calc_AE, [(omn2,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv2)])
-    AE_list_3 = pool.starmap(AEtok.calc_AE, [(omn3,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv3)])
+    AE_list_1 = pool.starmap(AEtok.calc_AE, [(omn1,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv1)])
+    AE_list_2 = pool.starmap(AEtok.calc_AE, [(omn2,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv2)])
+    AE_list_3 = pool.starmap(AEtok.calc_AE, [(omn3,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv3)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
     
     list_idx = 0

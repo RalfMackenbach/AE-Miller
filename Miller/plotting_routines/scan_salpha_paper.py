@@ -1,14 +1,10 @@
-import sys
-sys.path.insert(1, '/Users/ralfmackenbach/Documents/GitHub/AE-tok/Miller/scripts')
+import AEtok.AE_tokamak_calculation as AEtok
 import numpy as np
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
-import h5py
 import matplotlib        as mpl
-import AE_tokamak_calculation as AEtok
 from matplotlib import rc
-import Miller_functions as Mf
 import matplotlib.ticker as ticker
 rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 ## for Palatino and other serif fonts use:
@@ -26,9 +22,8 @@ s_q     = 'scan'
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 'scan'
-theta_res   = int(1e2+1)
-lam_res     = int(1e2)
-del_sign    = 0.0
+theta_res   = int(1e3+1)
+lam_res     = int(1e3)
 L_ref       = 'major'
 
 
@@ -45,8 +40,8 @@ def fmt(x, pos):
 
 
 # Construct grid for total integral
-s_grid          =  np.linspace(-2.0, +2.0, num=100, dtype='float64')
-alpha_grid      =  np.linspace(+0.0, +2.0, num=100, dtype='float64')
+s_grid          =  np.linspace(-2.0, +2.0, num=100)
+alpha_grid      =  np.linspace(+0.0, +2.0, num=100)
 
 
 sv, alphav = np.meshgrid(s_grid, alpha_grid, indexing='ij')
@@ -64,13 +59,13 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list_0 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q, kappa, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_0)])
+    AE_list_0 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q, kappa, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv_0)])
 
-    AE_list_1 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon, 1.0, kappa, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_1)])
+    AE_list_1 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon, 1.0, kappa, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv_1)])
 
-    AE_list_2 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q,   0.5, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_2)])
+    AE_list_2 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q,   0.5, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv_2)])
 
-    AE_list_3 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q, kappa,-delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv_3)])
+    AE_list_3 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q, kappa,-delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv_3)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()
@@ -139,10 +134,14 @@ if __name__ == "__main__":
     cbar2.solids.set_edgecolor("face")
     cbar3.solids.set_edgecolor("face")
     # plt.title(r'Available Energy as a function of $s$ and $\alpha$' '\n' r'$\omega_n$={}, $\eta$={}, $\epsilon$={}, $q$={}, $d R_0/ d r$={}, $\kappa$={}, $s_\kappa$={}, $\delta$={}, $s_\delta$={}' '\n'.format(omn,eta,epsilon,q,dR0dr,kappa,s_kappa,delta,s_delta))
+    axs[0,0].set_xlabel(r'$\alpha$')
     axs[1,0].set_xlabel(r'$\alpha$')
+    axs[0,1].set_xlabel(r'$\alpha$')
     axs[1,1].set_xlabel(r'$\alpha$')
     axs[0,0].set_ylabel(r'$s$')
     axs[1,0].set_ylabel(r'$s$')
+    axs[0,1].set_ylabel(r'$s$')
+    axs[1,1].set_ylabel(r'$s$')
     axs[0,0].text(1.7, -1.5, r'$(a)$',c='white')
     axs[0,1].text(1.7, -1.5, r'$(b)$',c='white')
     axs[1,0].text(1.7, -1.5, r'$(c)$',c='white')

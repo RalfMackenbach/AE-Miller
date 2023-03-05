@@ -1,12 +1,9 @@
-import sys
-sys.path.insert(1, '/Users/ralfmackenbach/Documents/GitHub/AE-tok/Miller/scripts')
+import AEtok.AE_tokamak_calculation as AEtok
 import numpy as np
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
-import h5py
 import matplotlib        as mpl
-import AE_tokamak_calculation as AEtok
 from matplotlib import rc
 import matplotlib.ticker as ticker
 rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
@@ -14,7 +11,7 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 #rc('font',**{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)
 
-omn     = 3.0
+omn     = 1.0
 eta     = 0.0
 epsilon = 'scan'
 q       = 'scan'
@@ -25,11 +22,11 @@ s_q     = 0.0
 s_kappa = 0.0   
 s_delta = 0.0
 alpha   = 0.0
-theta_res   = int(1e2)
-lam_res     = int(1e2+1)
-del_sign    = 0.0
-L_ref       = 'major'
-rho         = 1.0
+theta_res   = int(1e2+1)
+lam_res     = int(1e2)
+L_ref       = 'minor'
+A           = 3.0
+rho         = 0.7
 
 
 
@@ -41,8 +38,8 @@ def fmt(x, pos):
 
 
 # Construct grid for total integral
-eps_grid        =  np.logspace(-3,  -1,  num=50, dtype='float64')
-q_grid          =  np.logspace(-2,   0,  num=50, dtype='float64')
+eps_grid        =  np.logspace(-3,  -0.5,  num=100)
+q_grid          =  np.logspace(-2,   1.0,  num=100)
 
 
 epsv, qv = np.meshgrid(eps_grid, q_grid, indexing='ij')
@@ -57,7 +54,7 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list = pool.starmap(AEtok.calc_AE, [(omn,eta,epsv[idx],qv[idx],kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref,rho) for idx, val in np.ndenumerate(epsv)])
+    AE_list = pool.starmap(AEtok.calc_AE, [(omn,eta,epsv[idx],qv[idx],kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,L_ref,A,rho) for idx, val in np.ndenumerate(epsv)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()
@@ -72,7 +69,7 @@ if __name__ == "__main__":
 
 
 
-    plot = AEv / (qv**2.0 * np.sqrt(epsv) )
+    plot = AEv / ( np.sqrt(epsv) )
 
     levels = np.linspace(0, np.amax(plot), 37)
     fig = plt.figure(figsize=(3.375, 2.3))
@@ -81,7 +78,7 @@ if __name__ == "__main__":
     for c in cnt.collections:
         c.set_edgecolor("face")
     cbar = plt.colorbar(ticks=[0.0, np.amax(plot)])#np.amax(AE_list**(1.0))])
-    cbar.set_label(r'$\widehat{A}/q^2 \sqrt{\epsilon}$')
+    cbar.set_label(r'$\widehat{A}/\sqrt{\epsilon} $')
     # cbar.set_label(r'$\hat{A}$')
     cbar.solids.set_edgecolor("face")
 

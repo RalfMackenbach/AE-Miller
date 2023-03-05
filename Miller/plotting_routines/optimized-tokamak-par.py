@@ -1,14 +1,11 @@
-import sys
-sys.path.insert(1, '/Users/ralfmackenbach/Documents/GitHub/AE-tok/Miller/scripts')
+import AEtok.AE_tokamak_calculation as AEtok
 import numpy as np
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
 import h5py
 import matplotlib        as mpl
-import AE_tokamak_calculation as AEtok
 from matplotlib import rc
-import Miller_functions as Mf
 import matplotlib.ticker as ticker
 import scipy
 import matplotlib.cm as cm
@@ -26,10 +23,12 @@ q       = 3.0
 dR0dr   =-0.5
 s_kappa = 0.0
 s_delta = 0.0
-theta_res   = int(1e3)
-lam_res     = int(1e3+1)
+theta_res   = int(1e3+1)
+lam_res     = int(1e3)
 del_sign    = 0.0
-L_ref       = 'major'
+L_ref       = 'minor'
+A = 3.0
+rho = 1.0
 s_min = -1.0
 s_max = +4.0
 alpha_min = 0.0
@@ -38,7 +37,7 @@ kappa_min = 0.5
 kappa_max = 2.0
 delta_min =-0.5
 delta_max = 0.5
-res = 8
+res = 2
 
 s_grid          =   np.linspace(s_min, s_max, num=res, dtype='float64')
 alpha_grid      =   np.linspace(alpha_min, alpha_max, num=res, dtype='float64')
@@ -55,7 +54,7 @@ def fmt(x, pos):
     return r'${} \cdot 10^{{{}}}$'.format(a, b)
 
 def opt_func(s_q,alpha):
-    fun = lambda x: AEtok.calc_AE(omn,eta,epsilon,  q,x[0], x[1],dR0dr, s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref)
+    fun = lambda x: AEtok.calc_AE(omn,eta,epsilon,  q,x[0], x[1],dR0dr, s_q,s_kappa,s_delta,alpha,theta_res,lam_res,L_ref,A,rho)
     res = scipy.optimize.shgo(fun,bounds=((kappa_min,kappa_max),(delta_min,delta_max)),options={'disp': False} )
     return res
 
@@ -103,8 +102,7 @@ if __name__ == "__main__":
     pcat        = axs[3].pcolor(alphav,sv,cat,cmap=cmap,norm=norm)
     pcat.set_edgecolor('face')
     cbarcat     = fig.colorbar(pcat, ax=axs[3],orientation="horizontal",pad=0.3)
-    cbarcat.set_ticks(ticks=[0.5,1.5,2.5,3.5],length=0.0)
-    cbarcat.set_ticklabels([r'$\mathrm{NC}$',r'$\mathrm{NT}$',r'$\mathrm{PT}$',r'$\mathrm{PC}$'])
+    cbarcat.set_ticks(ticks=[0.5,1.5,2.5,3.5],labels=[r'$\mathrm{NC}$',r'$\mathrm{NT}$',r'$\mathrm{PT}$',r'$\mathrm{PC}$'])
 
     axs[0].set_ylabel(r'$s$')
     axs[0].set_xlabel(r'$\alpha$')

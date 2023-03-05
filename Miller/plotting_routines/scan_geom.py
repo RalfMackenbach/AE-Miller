@@ -1,12 +1,9 @@
-import sys
-sys.path.insert(1, '/Users/ralfmackenbach/Documents/GitHub/AE-tok/Miller/scripts')
+import AEtok.AE_tokamak_calculation as AEtok
 import numpy as np
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
-import h5py
 import matplotlib        as mpl
-import AE_tokamak_calculation as AEtok
 from matplotlib import rc
 import matplotlib.ticker as ticker
 rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
@@ -14,21 +11,21 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 #rc('font',**{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)
 
-omn     = 1.0
-eta     = 0.0
-epsilon = 0.8
-q       = 3.0
+omn     = 1e-10
+eta     = 1e10
+epsilon = 1/3
+q       = 2.0
 kappa   = 'scan'
 delta   = 'scan'
 dR0dr   = 0.0
-s_q     = 0.0
+s_q     = 2.0
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
 theta_res   = int(1e3+1)
 lam_res     = int(1e3)
-del_sign    = 0.0
 L_ref       = 'minor'
+A           = 3.0
 rho         = 1.0
 
 
@@ -57,7 +54,7 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref,rho) for idx, val in np.ndenumerate(kappav)])
+    AE_list = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,L_ref,A,rho) for idx, val in np.ndenumerate(kappav)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()
@@ -97,7 +94,7 @@ if __name__ == "__main__":
     #             dpi=1000,
     #             # Plot will be occupy a maximum of available space
     #             bbox_inches='tight')
-    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/delta-kappa/geom.eps', format='eps',
+    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/delta-kappa/geom.png', format='png',
                 #This is recommendation for publication plots
                 dpi=1000,
                 # Plot will be occupy a maximum of available space

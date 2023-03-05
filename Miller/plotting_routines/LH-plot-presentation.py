@@ -1,14 +1,11 @@
-import sys
-sys.path.insert(1, '/Users/ralfmackenbach/Documents/GitHub/AE-tok/Miller/scripts')
+import AEtok.AE_tokamak_calculation as AEtok
 import numpy as np
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
 import h5py
 import matplotlib        as mpl
-import AE_tokamak_calculation as AEtok
 from matplotlib import rc
-import Miller_functions as Mf
 import matplotlib.ticker as ticker
 rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 ## for Palatino and other serif fonts use:
@@ -25,8 +22,7 @@ dR0dr   = 0.0
 s_kappa = 0.0
 s_delta = 0.0
 theta_res   = int(1e2 +1)
-lam_res     = int(1e3)
-del_sign    = 0.0
+lam_res     = int(1e2)
 L_ref       = 'minor'
 
 
@@ -55,7 +51,7 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list = pool.starmap(AEtok.calc_AE, [(omnv[idx],eta,epsilon,q,kappa,deltav[idx],dR0dr,2 - 2*omnv[idx]/10 ,s_kappa,s_delta, 2 * omnv[idx]/10,theta_res,lam_res,del_sign,L_ref) for idx, val in np.ndenumerate(AEv)])
+    AE_list = pool.starmap(AEtok.calc_AE, [(omnv[idx],eta,epsilon,q,kappa,deltav[idx],dR0dr,2 - 2*omnv[idx]/10 ,s_kappa,s_delta, 2 * omnv[idx]/10,theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()
