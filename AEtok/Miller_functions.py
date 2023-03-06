@@ -97,10 +97,12 @@ class MC:
         self.fpR0           = fpR0
         self.sigma          = q/gamma * fpR0 - alpha/(2*epsilon)
         # calculate xi
-        xi,     xi_err      = quad(lambda theta: ltheta(theta,self) /(bs(theta,self) * bps(theta,self)),  -np.pi, np.pi)
+        xi,     xi_err      = quad(lambda theta: ltheta(theta,self) * bs(theta,self) / bps(theta,self),  -np.pi, np.pi)
         xi_2,   xi_2_err    = quad(lambda theta: ltheta(theta,self) / bps(theta,self),  -np.pi, np.pi)
+        xi_3,   xi_3_err    = quad(lambda theta: ltheta(theta,self) * bs(theta,self)**2 /(bs(theta,self)),  -np.pi, np.pi)
         self.xi             = xi
         self.xi_2           = xi_2
+        self.xi_3           = xi_3
 
 
 #############################################################################
