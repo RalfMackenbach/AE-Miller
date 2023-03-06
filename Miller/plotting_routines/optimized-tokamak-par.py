@@ -25,8 +25,7 @@ s_kappa = 0.0
 s_delta = 0.0
 theta_res   = int(1e3+1)
 lam_res     = int(1e3)
-del_sign    = 0.0
-L_ref       = 'minor'
+L_ref       = 'major'
 A = 3.0
 rho = 1.0
 s_min = -1.0
@@ -37,7 +36,7 @@ kappa_min = 0.5
 kappa_max = 2.0
 delta_min =-0.5
 delta_max = 0.5
-res = 2
+res = 100
 
 s_grid          =   np.linspace(s_min, s_max, num=res, dtype='float64')
 alpha_grid      =   np.linspace(alpha_min, alpha_max, num=res, dtype='float64')
@@ -105,6 +104,9 @@ if __name__ == "__main__":
     cbarcat.set_ticks(ticks=[0.5,1.5,2.5,3.5],labels=[r'$\mathrm{NC}$',r'$\mathrm{NT}$',r'$\mathrm{PT}$',r'$\mathrm{PC}$'])
 
     axs[0].set_ylabel(r'$s$')
+    axs[1].set_ylabel(r'$s$')
+    axs[2].set_ylabel(r'$s$')
+    axs[3].set_ylabel(r'$s$')
     axs[0].set_xlabel(r'$\alpha$')
     axs[1].set_xlabel(r'$\alpha$')
     axs[2].set_xlabel(r'$\alpha$')
