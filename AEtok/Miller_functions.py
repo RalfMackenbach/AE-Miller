@@ -137,13 +137,13 @@ def bps(theta,MC):
 
 # toroidal field normalized
 def bts(theta,MC):
-    #return 1/(R_s(theta,MC)) # by B0
-    return 1/(MC.gamma * R_s(theta,MC)) # by Bunit
+    return 1/(R_s(theta,MC)) # by B0
+    #return 1/(MC.gamma * R_s(theta,MC)) # by Bunit
 
 # total field strength normalized
 def bs(theta,MC):
-    #return np.sqrt((MC.gamma * MC.epsilon / MC.q * bps(theta,MC))**2 + bts(theta,MC)**2.0) # by B0
-    return np.sqrt((MC.epsilon / MC.q * bps(theta,MC))**2 + bts(theta,MC)**2.0) # by Bunit
+    return np.sqrt((MC.gamma * MC.epsilon / MC.q * bps(theta,MC))**2 + bts(theta,MC)**2.0) # by B0
+    #return np.sqrt((MC.epsilon / MC.q * bps(theta,MC))**2 + bts(theta,MC)**2.0) # by Bunit
 
 # function for R0*f'
 def fpR0_func(MC):
@@ -158,8 +158,8 @@ def rdbtdrho(theta,MC):
     return MC.epsilon * (  MC.gamma**2 *MC.epsilon / MC.q**2.0 * ( MC.sigma + MC.alpha/(2*MC.epsilon) ) * R_s(theta,MC) * bps(theta,MC) - sinu(theta,MC)/R_s(theta,MC) )
 
 def rdbdrho(theta,MC):
-    #return ( bts(theta,MC)**2 * rdbtdrho(theta,MC) + (MC.gamma * MC.epsilon / MC.q * bps(theta,MC))**2 * rdbpdrho(theta,MC) ) / bs(theta,MC)**2 # by B0
-    return ( bts(theta,MC)**2 * rdbtdrho(theta,MC) + (MC.epsilon / MC.q * bps(theta,MC))**2 * rdbpdrho(theta,MC) ) / bs(theta,MC)**2 # by Bunit
+    return ( bts(theta,MC)**2 * rdbtdrho(theta,MC) + (MC.gamma * MC.epsilon / MC.q * bps(theta,MC))**2 * rdbpdrho(theta,MC) ) / bs(theta,MC)**2 # by B0
+    #return ( bts(theta,MC)**2 * rdbtdrho(theta,MC) + (MC.epsilon / MC.q * bps(theta,MC))**2 * rdbpdrho(theta,MC) ) / bs(theta,MC)**2 # by Bunit
 
 def Z_s(theta,MC):
     return MC.epsilon*MC.kappa*np.sin(theta)
