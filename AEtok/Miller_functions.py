@@ -129,19 +129,21 @@ def ltheta(theta,MC):
 
 # sin of u
 def sinu(theta,MC):
-    return (MC.kappa*np.cos(theta))/np.sqrt(MC.kappa**2*np.cos(theta)**2 + (1 + MC.x*np.cos(theta))**2*np.sin(theta + MC.x*np.sin(theta))**2)
+    return (MC.kappa*np.cos(theta))/ltheta(theta,MC)
 
 # poloidal field normalized by Bp,0
 def bps(theta,MC):
-    return np.sqrt(MC.kappa**2*np.cos(theta)**2 + (1 + MC.x*np.cos(theta))**2*np.sin(theta + MC.x*np.sin(theta))**2)/(MC.kappa*(1 + MC.epsilon*np.cos(theta + MC.x*np.sin(theta)))*(np.cos(theta)*(MC.dR0dr + np.cos(theta + MC.x*np.sin(theta))) + (1 + MC.s_kappa + (-MC.s_delta + MC.x + MC.s_kappa*MC.x)*np.cos(theta))*np.sin(theta)*np.sin(theta + MC.x*np.sin(theta))))
+    return ltheta(theta,MC) / (MC.kappa * R_s(theta,MC) * (np.cos(theta)*(MC.dR0dr + np.cos(theta + MC.x*np.sin(theta))) + (1 + MC.s_kappa + (-MC.s_delta + MC.x + MC.s_kappa*MC.x)*np.cos(theta))*np.sin(theta)*np.sin(theta + MC.x*np.sin(theta))))
 
-# toroidal field normalized by B0
+# toroidal field normalized
 def bts(theta,MC):
-    return 1/(1 + MC.epsilon*np.cos(theta + MC.x*np.sin(theta)))
+    #return 1/(R_s(theta,MC)) # by B0
+    return 1/(MC.gamma * R_s(theta,MC)) # by Bunit
 
-# total field strength normalized by B0
+# total field strength normalized
 def bs(theta,MC):
-    return np.sqrt(MC.gamma * MC.epsilon / MC.q * bps(theta,MC)**2.0 + bts(theta,MC)**2.0)
+    #return np.sqrt((MC.gamma * MC.epsilon / MC.q * bps(theta,MC))**2 + bts(theta,MC)**2.0) # by B0
+    return np.sqrt((MC.epsilon / MC.q * bps(theta,MC))**2 + bts(theta,MC)**2.0) # by Bunit
 
 # function for R0*f'
 def fpR0_func(MC):
@@ -156,7 +158,8 @@ def rdbtdrho(theta,MC):
     return MC.epsilon * (  MC.gamma**2 *MC.epsilon / MC.q**2.0 * ( MC.sigma + MC.alpha/(2*MC.epsilon) ) * R_s(theta,MC) * bps(theta,MC) - sinu(theta,MC)/R_s(theta,MC) )
 
 def rdbdrho(theta,MC):
-    return ( bts(theta,MC)**2 * rdbtdrho(theta,MC) + (MC.gamma * MC.epsilon / MC.q * bps(theta,MC))**2 * rdbpdrho(theta,MC) ) / bs(theta,MC)**2
+    #return ( bts(theta,MC)**2 * rdbtdrho(theta,MC) + (MC.gamma * MC.epsilon / MC.q * bps(theta,MC))**2 * rdbpdrho(theta,MC) ) / bs(theta,MC)**2 # by B0
+    return ( bts(theta,MC)**2 * rdbtdrho(theta,MC) + (MC.epsilon / MC.q * bps(theta,MC))**2 * rdbpdrho(theta,MC) ) / bs(theta,MC)**2 # by Bunit
 
 def Z_s(theta,MC):
     return MC.epsilon*MC.kappa*np.sin(theta)
