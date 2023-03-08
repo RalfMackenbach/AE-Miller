@@ -5,6 +5,7 @@ import  matplotlib.pyplot       as      plt
 from    matplotlib              import  cm
 import  matplotlib.colors       as      mplc
 from    scipy.special           import  erf, ellipe, ellipk
+from    scipy.integrate         import  romb, romberg
 
 
 def AE_per_lam(c0,c1,tau_b,wlam):
@@ -210,6 +211,11 @@ def plot_precession(walpha,roots,theta,b_arr,lam_arr,ae_per_lam):
     ax[0].set_xlabel(r'$\theta$')
     ax[0].set_ylabel(r'$B$')
     ax001.set_ylabel(r'$\omega_\lambda$',color='tab:blue')
+    plt.savefig('prec.eps', format='eps',
+                #This is recommendation for publication plots
+                dpi=1000,
+                # Plot will be occupy a maximum of available space
+                bbox_inches='tight')
     plt.show()
 
 
@@ -266,6 +272,11 @@ def plot_precession(walpha,roots,theta,b_arr,lam_arr,ae_per_lam):
     plt.subplots_adjust(left=0.1, right=0.88, top=0.99, bottom=0.08)
     cbar = plt.colorbar(cm.ScalarMappable(norm=mplc.Normalize(vmin=0.0, vmax=max_ae_per_lam, clip=False), cmap=cm.plasma), ticks=[0, max_ae_per_lam], ax=ax,location='bottom',label=r'$\widehat{A}_\lambda$') #'%.3f'
     cbar.ax.set_xticklabels([0, round(max_ae_per_lam, 1)])
+    plt.savefig('ae_per_lam.eps', format='eps',
+                #This is recommendation for publication plots
+                dpi=1000,
+                # Plot will be occupy a maximum of available space
+                bbox_inches='tight')
     plt.show()
 
 

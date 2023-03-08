@@ -137,11 +137,11 @@ def bps(theta,MC):
 
 # toroidal field normalized by B0
 def bts(theta,MC):
-    return 1/(1 + MC.epsilon*np.cos(theta + MC.x*np.sin(theta)))
+    return 1/R_s(theta,MC)
 
 # total field strength normalized by B0
 def bs(theta,MC):
-    return np.sqrt(MC.gamma * MC.epsilon / MC.q * bps(theta,MC)**2.0 + bts(theta,MC)**2.0)
+    return np.sqrt((MC.gamma * MC.epsilon / MC.q * bps(theta,MC))**2.0 + bts(theta,MC)**2.0)
 
 # function for R0*f'
 def fpR0_func(MC):
