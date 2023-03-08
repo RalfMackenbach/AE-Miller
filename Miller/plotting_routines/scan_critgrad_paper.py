@@ -12,14 +12,14 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 #rc('font',**{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)
 
-omn_fac = 1e2
+omn_fac = 1e3
 omn1 = omn_fac*1.0
 omn2 = omn_fac*5.0
 omn3 = omn_fac*10.0
 eta     = 0.0
-epsilon = 1e-4
+epsilon = 1/3
 q       = 2.0
-kappa   = 1.0
+kappa   = 3/2
 delta   = 0.5
 dR0dr   = 0.0
 s_q     = 0.0
@@ -38,13 +38,13 @@ def fmt(x, pos):
     b = int(b)
     return r'${} \cdot 10^{{{}}}$'.format(a, b)
 
-res = 10
+res = 50
 
-s_grid          =  np.linspace(-1.0, +4.0, num=res, dtype='float64')
-alpha_grid      =  np.linspace( 0.0, +1.0, num=res, dtype='float64')
+s_grid          =  np.linspace(-1.0, +4.0, num=res)
+alpha_grid      =  np.linspace( 0.0, +1.0, num=res)
 
-kappa_grid      =  np.linspace(+0.5, +2.0, num=res, dtype='float64')
-delta_grid      =  np.linspace(-0.8, +0.8, num=res, dtype='float64')
+kappa_grid      =  np.linspace(+0.5, +2.0, num=res)
+delta_grid      =  np.linspace(-0.8, +0.8, num=res)
 
 
 sv, alphav = np.meshgrid(s_grid, alpha_grid, indexing='ij')
@@ -136,7 +136,7 @@ if __name__ == "__main__":
     axs[0].text(1/8, -0.3, r'$(a)$',ha='center', va='center')
     axs[1].text((2-0.5)/8+0.5, (1.6)/8+-0.8, r'$(b)$',ha='center', va='center')
     plt.tight_layout()
-    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/crit_grad/contours_critgrad.eps', format='eps',
+    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/crit-grad/contours_critgrad.eps', format='eps',
                 #This is recommendation for publication plots
                 dpi=1000,
                 # Plot will be occupy a maximum of available space

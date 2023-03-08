@@ -126,7 +126,7 @@ if __name__ == "__main__":
     axs[0].text(1/8, -0.3, r'$(a)$',ha='center', va='center')
     axs[1].text((2-0.5)/8+0.5, (1.6)/8+-0.8, r'$(b)$',ha='center', va='center')
     plt.tight_layout()
-    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/crit_grad/contours_critgrad.eps', format='eps',
+    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/crit-grad/contours_critgrad.eps', format='eps',
                 #This is recommendation for publication plots
                 dpi=1000,
                 # Plot will be occupy a maximum of available space

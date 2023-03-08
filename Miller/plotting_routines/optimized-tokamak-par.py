@@ -35,7 +35,7 @@ kappa_min = 0.5
 kappa_max = 2.0
 delta_min =-0.5
 delta_max = 0.5
-res = 100
+res = 10
 
 s_grid          =   np.linspace(s_min, s_max, num=res, dtype='float64')
 alpha_grid      =   np.linspace(alpha_min, alpha_max, num=res, dtype='float64')
@@ -79,7 +79,7 @@ if __name__ == "__main__":
         AE_opt[idx]       = np.abs(fun)
         list_idx = list_idx+1
 
-    fig, axs = plt.subplots(1,4, figsize=(6.850394, 5.0/2)) #figsize=(6.850394, 3.0)
+    fig, axs = plt.subplots(1,4, figsize=(6.850394, 5.0/2.5)) #figsize=(6.850394, 3.0)
     pAE         = axs[0].pcolor(alphav,sv,AE_opt,cmap='plasma')
     pAE.set_edgecolor('face')
     cbarae   = fig.colorbar(pAE, ticks=[np.amin(AE_opt),np.amax(AE_opt)], ax=axs[0],orientation="horizontal",pad=0.3,label=r'$\widehat{A}$')

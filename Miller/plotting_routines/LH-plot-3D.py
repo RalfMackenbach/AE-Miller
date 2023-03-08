@@ -7,7 +7,6 @@ import h5py
 import matplotlib        as mpl
 
 
-omn     = 'scan'
 eta     = 0.0
 epsilon = 1/3
 q       = 3.0
@@ -20,7 +19,7 @@ theta_res   = int(1e3+1)
 L_ref       = 'major'
 
 
-res = 10
+res = 30
 
 
 def fmt(x, pos):
@@ -32,7 +31,7 @@ def fmt(x, pos):
 
 
 # Construct grid for total integral
-omn_grid          =  np.linspace(+0.0,+20.0, num=res, dtype='float64')
+omn_grid          =  np.linspace(+0.1,+20.0, num=res, dtype='float64')
 s_grid            =  np.linspace(+4.0, +3.0, num=res, dtype='float64')
 alpha_grid        =  np.linspace(+0.0, +2.0, num=res, dtype='float64')
 

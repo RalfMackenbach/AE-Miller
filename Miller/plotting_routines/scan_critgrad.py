@@ -86,7 +86,7 @@ if __name__ == "__main__":
     p=np.polyfit(omn_grid[-10::], AE_list[-10::], 1)
     axs[1].plot(omn_grid,p[0]*omn_grid + p[1],linestyle='dotted',color='black')
     print('crit grad is:', -p[1]/p[0])
-    aeomnmax = AEtok.calc_AE(5.0,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref)
+    aeomnmax = AEtok.calc_AE(5.0,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,L_ref)
     axs[1].axvline(x=-p[1]/p[0], color='red', linestyle='solid')
     axs[1].text(-p[1]/p[0]-0.5, aeomnmax/2, r'$\hat{\omega}_{c}$',rotation='vertical',color='red')
     axs[1].set_xlabel(r'$\hat{\omega}_n$')
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     logval = (np.log10(AE_list[-1])-np.log10(AE_list[0]))/10 + np.log10(AE_list[0])
     axs[0].text(1e2, 10**logval, r'$(a)$')
     plt.tight_layout()
-    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/crit_grad/example.eps', format='eps',
+    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/crit-grad/example.eps', format='eps',
                 #This is recommendation for publication plots
                 dpi=1000,
                 # Plot will be occupy a maximum of available space

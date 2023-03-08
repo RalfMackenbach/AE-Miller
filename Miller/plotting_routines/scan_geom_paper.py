@@ -22,7 +22,7 @@ s_q     = 0.0
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
-theta_res   = int(1e4 +1)
+theta_res   = int(1e3 +1)
 L_ref       = 'major'
 
 
