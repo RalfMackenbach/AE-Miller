@@ -18,16 +18,15 @@ eta     = 0.0
 epsilon = 1/3
 q       = 3.0
 kappa   = 1.5
-delta_bound = 0.2
+delta_bound = 0.1
 dR0dr   =-0.5
 s_q     = 0.0
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
-theta_res   = int(1e3)
-lam_res     = int(1e3+1)
+theta_res   = int(1e3+1)
 L_ref       = 'major'
-res = 10
+res = 50
 
 
 
@@ -37,10 +36,10 @@ res = 10
 
 
 # Construct grid for total integral
-s_grid          =  np.linspace(-1.0, +4.0, num=res, dtype='float64')
-alpha_grid      =  np.linspace(+0.0, +0.5, num=res, dtype='float64')
-omn_grid        =  np.logspace(-1.0, +1.0, num=res, dtype='float64')
-eta_grid        =  np.linspace(+0.0, +4/3, num=res, dtype='float64')
+s_grid          =  np.linspace(-1.0, +4.0, num=res)
+alpha_grid      =  np.linspace(+0.0, +0.5, num=res)
+omn_grid        =  np.logspace(-1.0, +1.0, num=res)
+eta_grid        =  np.linspace(+0.0, +4/3, num=res)
 
 
 sv, alphav = np.meshgrid(s_grid, alpha_grid, indexing='ij')
@@ -65,10 +64,10 @@ if __name__ == "__main__":
 
     for delta in [-delta_bound,delta_bound]:
         start_time = time.time()            #    omn,eta,epsilon,q,kappa,delta,dR0dr,s_q[idx],s_kappa[idx],s_delta[idx],alpha[idx],theta_res,lam_res,del_sign,L_ref
-        AE_list0 = pool.starmap(AEtok.calc_AE, [(0.5,eta,1e-2, 1.0,1.5  ,delta, 0.0 ,sv[idx],    0.0,     0.0,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv_neg_0)])
-        AE_list1 = pool.starmap(AEtok.calc_AE, [(2.0,eta,1/3 , 3.0,1.5  ,delta,-0.5 ,sv[idx],    0.5,     0.0,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv_neg_1)])
-        AE_list2 = pool.starmap(AEtok.calc_AE, [(omnv[idx],etav[idx],1e-2,1.0,1.5,delta, 0.0,0.0,0.0,0.0,0.0,theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv_neg_2)])
-        AE_list3 = pool.starmap(AEtok.calc_AE, [(omnv[idx],etav[idx],1/3 ,3.0,1.5,delta,-0.5,2.0,0.5,0.0,0.5,theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv_neg_3)])
+        AE_list0 = pool.starmap(AEtok.calc_AE, [(0.5,eta,1e-2, 1.0,1.5  ,delta, 0.0 ,sv[idx],    0.0,     0.0,alphav[idx],theta_res,L_ref) for idx, val in np.ndenumerate(AEv_neg_0)])
+        AE_list1 = pool.starmap(AEtok.calc_AE, [(2.0,eta,1/3 , 3.0,1.5  ,delta,-0.5 ,sv[idx],    0.5,     0.0,alphav[idx],theta_res,L_ref) for idx, val in np.ndenumerate(AEv_neg_1)])
+        AE_list2 = pool.starmap(AEtok.calc_AE, [(omnv[idx],etav[idx],1e-2,1.0,1.5,delta, 0.0,0.0,0.0,0.0,0.0,theta_res,L_ref) for idx, val in np.ndenumerate(AEv_neg_2)])
+        AE_list3 = pool.starmap(AEtok.calc_AE, [(omnv[idx],etav[idx],1/3 ,3.0,1.5,delta,-0.5,2.0,0.5,0.0,0.5,theta_res,L_ref) for idx, val in np.ndenumerate(AEv_neg_3)])
         print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
         # reorder data full int

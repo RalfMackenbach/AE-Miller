@@ -22,8 +22,7 @@ s_q     = 0.0
 s_kappa = 0.0   
 s_delta = 0.0
 alpha   = 0.0
-theta_res   = int(1e2+1)
-lam_res     = int(1e2)
+theta_res   = int(1e3+1)
 L_ref       = 'minor'
 A           = 3.0
 rho         = 0.7
@@ -54,7 +53,7 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list = pool.starmap(AEtok.calc_AE, [(omn,eta,epsv[idx],qv[idx],kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,L_ref,A,rho) for idx, val in np.ndenumerate(epsv)])
+    AE_list = pool.starmap(AEtok.calc_AE, [(omn,eta,epsv[idx],qv[idx],kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,L_ref,A,rho) for idx, val in np.ndenumerate(epsv)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()

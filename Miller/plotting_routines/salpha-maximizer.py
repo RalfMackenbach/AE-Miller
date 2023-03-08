@@ -27,8 +27,7 @@ s_q     = 'scan'
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 'scan'
-theta_res   = int(1e2 +1)
-lam_res     = int(1e2)
+theta_res   = int(1e3 +1)
 L_ref       = 'major'
 plot_steepest_descent = True
 
@@ -45,8 +44,7 @@ marker_vert = []
 vals=[0.5,0]
 for idx, val in enumerate(scan_arr):
     print('at step', idx+1, 'out of', len(scan_arr))
-    #                               (omn,eta,epsilon,  q,kappa,delta,dR0dr, s_q,s_kappa,s_delta,alpha,theta_res,lam_res,del_sign,L_ref,rho)
-    fun = lambda x: -1*AEtok.calc_AE(omn,eta,epsilon,  q,kappa,  val,dR0dr,x[0],s_kappa,s_delta, x[1],theta_res,lam_res,L_ref)
+    fun = lambda x: -1*AEtok.calc_AE(omn,eta,epsilon,  q,kappa,  val,dR0dr,x[0],s_kappa,s_delta, x[1],theta_res,L_ref)
     res = scipy.optimize.minimize(fun, vals)
     vals=res.x
     s_arr[idx] = vals[0]
@@ -84,7 +82,7 @@ for idx, val in enumerate(AE_arr):
             AE0 = AE_arr[idx]
             s0  = s_arr[idx]
             a0  = alpha_arr[idx]
-            fun = lambda theta: AEtok.calc_AE(omn,eta,epsilon,  q,kappa,scan_val,dR0dr,s0+ds*np.sin(theta),s_kappa,s_delta,a0+da*np.cos(theta),theta_res,lam_res,L_ref)
+            fun = lambda theta: AEtok.calc_AE(omn,eta,epsilon,  q,kappa,scan_val,dR0dr,s0+ds*np.sin(theta),s_kappa,s_delta,a0+da*np.cos(theta),theta_res,L_ref)
             res = scipy.optimize.minimize(fun, 0)
             theta_min=res.x
             headscale=0.8

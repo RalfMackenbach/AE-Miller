@@ -25,7 +25,6 @@ L_ref = 'major'
 epsilon = 1/3
 A = 3.0
 rho = 0.5
-lam_res = int(1e5)
 
 
 
@@ -47,7 +46,7 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list = pool.starmap(AEtok.calc_AE_salpha, [(omn,eta,epsilon,q,sv[idx],alphav[idx],lam_res,L_ref,A,rho) for idx, val in np.ndenumerate(sv)])
+    AE_list = pool.starmap(AEtok.calc_AE_salpha, [(omn,eta,epsilon,q,sv[idx],alphav[idx],L_ref,A,rho) for idx, val in np.ndenumerate(sv)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()

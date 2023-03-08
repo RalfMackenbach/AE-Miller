@@ -25,8 +25,7 @@ s_q     = 0.0
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
-theta_res   = int(1e4 +1)
-lam_res     = int(1e4)
+theta_res   = int(1e3+1)
 L_ref       = 'major'
 
 
@@ -69,10 +68,10 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_sa_1 = pool.starmap(AEtok.calc_AE, [(omn1,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEsa1)])
-    AE_sa_2 = pool.starmap(AEtok.calc_AE, [(omn2,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEsa2)])
-    AE_kd_1 = pool.starmap(AEtok.calc_AE, [(omn1,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEkd1)])
-    AE_kd_2 = pool.starmap(AEtok.calc_AE, [(omn2,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEkd2)])
+    AE_sa_1 = pool.starmap(AEtok.calc_AE, [(omn1,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,L_ref) for idx, val in np.ndenumerate(AEsa1)])
+    AE_sa_2 = pool.starmap(AEtok.calc_AE, [(omn2,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,L_ref) for idx, val in np.ndenumerate(AEsa2)])
+    AE_kd_1 = pool.starmap(AEtok.calc_AE, [(omn1,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,L_ref) for idx, val in np.ndenumerate(AEkd1)])
+    AE_kd_2 = pool.starmap(AEtok.calc_AE, [(omn2,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,L_ref) for idx, val in np.ndenumerate(AEkd2)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
     
     list_idx = 0

@@ -23,7 +23,6 @@ s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
 theta_res   = int(1e3+1)
-lam_res     = int(1e3)
 L_ref       = 'minor'
 A           = 3.0
 rho         = 1.0
@@ -38,8 +37,8 @@ def fmt(x, pos):
 
 
 # Construct grid for total integral
-kappa_grid      =  np.linspace(+0.5, +2.0, num=20, dtype='float64')
-delta_grid      =  np.linspace(-0.5, +0.5, num=20, dtype='float64')
+kappa_grid      =  np.linspace(+0.5, +2.0, num=20)
+delta_grid      =  np.linspace(-0.5, +0.5, num=20)
 
 
 kappav, deltav = np.meshgrid(kappa_grid, delta_grid, indexing='ij')
@@ -54,7 +53,7 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,lam_res,L_ref,A,rho) for idx, val in np.ndenumerate(kappav)])
+    AE_list = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,q,kappav[idx],deltav[idx],dR0dr,s_q,s_kappa,s_delta,alpha,theta_res,L_ref,A,rho) for idx, val in np.ndenumerate(kappav)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()

@@ -23,7 +23,6 @@ s_kappa = 0.0
 s_delta = 0.0
 alpha   = 'scan'
 theta_res   = int(1e3+1)
-lam_res     = int(1e3)
 L_ref       = 'major'
 
 
@@ -38,10 +37,11 @@ def fmt(x, pos):
         return r'${}$'.format(a)
 
 
+res = 50
 
 # Construct grid for total integral
-s_grid          =  np.linspace(-2.0, +2.0, num=100)
-alpha_grid      =  np.linspace(+0.0, +2.0, num=100)
+s_grid          =  np.linspace(-2.0, +2.0, num=res)
+alpha_grid      =  np.linspace(+0.0, +2.0, num=res)
 
 
 sv, alphav = np.meshgrid(s_grid, alpha_grid, indexing='ij')
@@ -59,13 +59,13 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list_0 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q, kappa, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv_0)])
+    AE_list_0 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q, kappa, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,L_ref) for idx, val in np.ndenumerate(AEv_0)])
 
-    AE_list_1 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon, 1.0, kappa, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv_1)])
+    AE_list_1 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,1.0, kappa, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,L_ref) for idx, val in np.ndenumerate(AEv_1)])
 
-    AE_list_2 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q,   0.5, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv_2)])
+    AE_list_2 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q,   0.5, delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,L_ref) for idx, val in np.ndenumerate(AEv_2)])
 
-    AE_list_3 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q, kappa,-delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv_3)])
+    AE_list_3 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,  q, kappa,-delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,L_ref) for idx, val in np.ndenumerate(AEv_3)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()

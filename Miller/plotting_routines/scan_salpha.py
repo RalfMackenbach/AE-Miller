@@ -26,8 +26,7 @@ s_q     = 'scan'
 s_kappa = 0.7
 s_delta = 0.25
 alpha   = 'scan'
-theta_res   = int(1e2 +1)
-lam_res     = int(1e2)
+lam_res     = int(1e3+1)
 L_ref       = 'major'
 
 
@@ -59,7 +58,7 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,lam_res,L_ref) for idx, val in np.ndenumerate(AEv)])
+    AE_list = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],L_ref) for idx, val in np.ndenumerate(AEv)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()
@@ -69,8 +68,8 @@ if __name__ == "__main__":
     # reorder data full int
     list_idx = 0
     for idx, val in np.ndenumerate(AEv):
-        AEv[idx]    = AE_list[list_idx].ae_val
-        alpha_TGLFv[idx] = AE_list[list_idx].alpha_TGLF
+        AEv[idx]    = AE_list[list_idx]
+        alphav[idx] = AE_list[list_idx]
         list_idx    = list_idx + 1
 
     np.save('AE_mat.npy', AEv)    # .npy extension is added if not given

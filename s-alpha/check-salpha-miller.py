@@ -25,10 +25,12 @@ def fmt(x, pos):
 
 
 
+res = 100
+
 
 # Construct grid for total integral
-s_grid      =  np.linspace(-2.0, +2.0,   num=100)
-alpha_grid   = np.linspace(+0.0, +2.0,   num=100)
+s_grid      =  np.linspace(-2.0, +2.0,   num=res)
+alpha_grid   = np.linspace(+0.0, +2.0,   num=res)
 
 
 sv, alphav     = np.meshgrid(s_grid, alpha_grid, indexing='ij')
@@ -49,15 +51,13 @@ if __name__ == "__main__":
     L_ref = 'major'
     A = 3.0
     rho = 1e-6
-    theta_res=int(1e3)
-    lam_res_mill = int(1e3)
-    lam_res_salp = int(1e5)
+    theta_res=int(1e3+1)
 
     # time the full integral
     start_time = time.time()
-    AE_list0 = pool.starmap(AEtok.calc_AE_salpha, [(omn,eta,epsilon,q_val,sv[idx],alphav[idx],lam_res_salp,L_ref,A,rho) for idx, val in np.ndenumerate(sv)])
+    AE_list0 = pool.starmap(AEtok.calc_AE_salpha, [(omn,eta,epsilon,q_val,sv[idx],alphav[idx],L_ref,A,rho) for idx, val in np.ndenumerate(sv)])
     print('s-alpha done')
-    AE_list1 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,q_val,1.0,0.0,0.0,sv[idx],0.0,0.0,alphav[idx],theta_res,lam_res_mill,L_ref,A,rho) for idx, val in np.ndenumerate(sv)])
+    AE_list1 = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,q_val,1.0,0.0,0.0,sv[idx],0.0,0.0,alphav[idx],theta_res,L_ref,A,rho) for idx, val in np.ndenumerate(sv)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()

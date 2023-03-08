@@ -5,7 +5,7 @@ import  matplotlib.pyplot       as      plt
 from    matplotlib              import  cm
 import  matplotlib.colors       as      mplc
 from    scipy.special           import  erf, ellipe, ellipk
-from    scipy.integrate         import  romb, romberg
+from    scipy.integrate         import  quad
 
 
 def AE_per_lam(c0,c1,tau_b,wlam):
@@ -62,7 +62,7 @@ def all_drifts(f,h0,h1,x):
 
 
 
-def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res=1000,lam_res=1001,L_ref='major',A=3.0,rho=1.0,plot_precs=False):
+def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res=1001,L_ref='major',A=3.0,rho=1.0,int_meth='quad',lam_res=1000,plot_precs=False):
     """
     ``calc_AE`` calculates the AE of a Miller tokamak.
     Takes as input the following set of parameters
@@ -79,7 +79,6 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
         s_delta:    variation in delta, r * d arcsin(delta)/dr
         alpha:      alpha_MHD, -epsilon * r dp/dr / (poloidal magnetic pressure)**2
         theta_res:  number of theta nodes used for gtrapz
-        lam_res:    number of lambda values used for integral over lambda
         L_ref:      reference lengtscale, either 'major', or 'minor'.
                     If chosen 'minor', one has to pass the kwargs for the device
                     aspect ratio, and rho as well. In 'minor' omn is assumed to be
@@ -87,8 +86,14 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
                     rho and aspect ratio.
         A:          Device aspect ratio (R0/a_minor), only needed if L_ref='minor'
         rho:        Normalized radial location r/a, only needed if L_ref='minor'
+        int_meth:   Integration method over lambda. 'trapz' uses trapezoidal rule,
+                    'quad' uses quadrature. If 'trapz', one can set the resolution
+                    via lam_res. If one wants to plot AE per lambda, trapz needs to
+                    be used.
+        lam_res:    lambda resolution for trapezoidal integral over lambda.
         plot_precs: Boolean. If set to True, one plots the AE per lambda.
-                    Can be useful for debugging and physics insights.
+                    Can be useful for debugging and physics insights. Needs
+                    'trapz' for int_meth.
     """
 
     # Do conversions between minor and major here
@@ -121,38 +126,64 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
     bps         = Mf.bps(theta_arr,MC)
     Rs          = Mf.R_s(theta_arr,MC)
     l_theta     = Mf.ltheta(theta_arr,MC)
+    
+    if int_meth=='trapz':
+        lam_arr     = np.delete(np.linspace(1/np.amax(b_arr),1/np.amin(b_arr),lam_res+1,endpoint=False),0)
+        AE_arr      = np.empty_like(lam_arr)
+        ae_list     = []
+        oml_list    = []
+        root_list   = []
 
-    lam_arr     = np.delete(np.linspace(1/np.amax(b_arr),1/np.amin(b_arr),lam_res+1,endpoint=False),0)
-    AE_arr      = np.empty_like(lam_arr)
-    ae_list     = []
-    oml_list    = []
-    root_list   = []
+        for idx, lam_val in enumerate(lam_arr):
+            averaging_arr   = ( 2. * ( 1. - lam_val*b_arr ) * ( rdbdrho - rdbpdrho - 1./Rc ) - lam_val * b_arr * rdbdrho ) / ( MC.epsilon * bps * Rs )
+            dldtheta        =  l_theta * b_arr / bps
+            f_arr_numer     = averaging_arr * dldtheta
+            f_arr_denom     = l_theta * b_arr/ bps
+            f               = 1 - lam_val * b_arr
+            ave,roots       = all_drifts(f,f_arr_denom,f_arr_numer,theta_arr)
+            den,num         = ave[0], ave[1]
+            oml             = np.asarray(num)/np.asarray(den)
+            g_hat_eps       = np.asarray(den)*np.sqrt(eps)/xi
+            c0              = np.asarray( omn / (oml) * (1. - 3./2. * eta) )
+            c1              = np.asarray(1. - omn / (oml) * eta)
+            int_z           = AE_per_lam(c0,c1,g_hat_eps,oml)/MC.epsilon
+            ae_list.append(int_z)
+            AE_arr[idx]     = np.sum(int_z)
+            oml_list.append(list(oml))
+            root_list.append(list(roots))
 
-    for idx, lam_val in enumerate(lam_arr):
-        averaging_arr   = ( 2. * ( 1. - lam_val*b_arr ) * ( rdbdrho - rdbpdrho - 1./Rc ) - lam_val * b_arr * rdbdrho ) / ( MC.epsilon * bps * Rs )
-        dldtheta        =  l_theta * b_arr / bps
-        f_arr_numer     = averaging_arr * dldtheta
-        f_arr_denom     = l_theta * b_arr/ bps
-        f               = 1 - lam_val * b_arr
-        ave,roots       = all_drifts(f,f_arr_denom,f_arr_numer,theta_arr)
-        den,num         = ave[0], ave[1]
-        oml             = np.asarray(num)/np.asarray(den)
-        g_hat_eps       = np.asarray(den)*np.sqrt(eps)/xi
-        c0              = np.asarray( omn / (oml) * (1. - 3./2. * eta) )
-        c1              = np.asarray(1. - omn / (oml) * eta)
-        int_z           = AE_per_lam(c0,c1,g_hat_eps,oml)/MC.epsilon
-        ae_list.append(int_z)
-        AE_arr[idx]     = np.sum(int_z)
-        oml_list.append(list(oml))
-        root_list.append(list(roots))
+        fluxtube_vol = MC.xi_2 / MC.xi
 
-    fluxtube_vol = MC.xi_2 / MC.xi
+        int_res = np.trapz(AE_arr,lam_arr)
 
-    if plot_precs==True:
-        plot_precession(oml_list,root_list,theta_arr,b_arr,lam_arr,ae_list)
+        if plot_precs==True:
+            plot_precession(oml_list,root_list,theta_arr,b_arr,lam_arr,ae_list)
+
+    if int_meth=='quad':
+        def quad_int(lam_val):
+            averaging_arr   = ( 2. * ( 1. - lam_val*b_arr ) * ( rdbdrho - rdbpdrho - 1./Rc ) - lam_val * b_arr * rdbdrho ) / ( MC.epsilon * bps * Rs )
+            dldtheta        =  l_theta * b_arr / bps
+            f_arr_numer     = averaging_arr * dldtheta
+            f_arr_denom     = l_theta * b_arr/ bps
+            f               = 1 - lam_val * b_arr
+            ave,roots       = all_drifts(f,f_arr_denom,f_arr_numer,theta_arr)
+            den,num         = ave[0], ave[1]
+            oml             = np.asarray(num)/np.asarray(den)
+            g_hat_eps       = np.asarray(den)*np.sqrt(eps)/xi
+            c0              = np.asarray( omn / (oml) * (1. - 3./2. * eta) )
+            c1              = np.asarray(1. - omn / (oml) * eta)
+            int_z           = AE_per_lam(c0,c1,g_hat_eps,oml)/MC.epsilon
+            return np.sum(int_z)
+
+        lam_min     = 1./b_arr.max()
+        lam_max     = 1./b_arr.min()
+
+        int_res, err = quad(quad_int,lam_min,lam_max,epsrel=1e-3,epsabs=1e-20,limit=1000)
+
+        fluxtube_vol = MC.xi_2 / MC.xi
 
     # I now use the Ansatz C_r = 1.0 instead of q.
-    return prefac * np.sqrt(epsilon) * np.trapz(AE_arr,lam_arr) / fluxtube_vol
+    return prefac * np.sqrt(epsilon) * int_res / fluxtube_vol
     
     
 
@@ -293,11 +324,11 @@ def CHM(k2,s,alpha,q):
     G2 = EK + k2 - 1
     G3 = EK * (2 * k2 - 1) +1 - k2 
     wlam = 2 * ( G1 - alpha/(4*q**2) + 2 * s * G2 - 2 * alpha / 3 * G3 )
-    return wlam, K
+    return np.asarray(wlam), np.asarray(K)
 
 
 
-def calc_AE_salpha(omn,eta,epsilon,q,s_q,alpha,lam_res=1000,L_ref='major',A=3.0,rho=1.0):
+def calc_AE_salpha(omn,eta,epsilon,q,s_q,alpha,L_ref='major',A=3.0,rho=1.0,int_meth='quad',lam_res=1000):
     '''
     ``calc_AE`` calculates the AE of a Miller tokamak.
     Takes as input the following set of parameters
@@ -316,6 +347,11 @@ def calc_AE_salpha(omn,eta,epsilon,q,s_q,alpha,lam_res=1000,L_ref='major',A=3.0,
                     rho and aspect ratio.
         A:          Device aspect ratio (R0/a_minor), only needed if L_ref='minor'
         rho:        Normalized radial location r/a, only needed if L_ref='minor'
+        int_meth:   Integration method over lambda. 'trapz' uses trapezoidal rule,
+                    'quad' uses quadrature. If 'trapz', one can set the resolution
+                    via lam_res. If one wants to plot AE per lambda, trapz needs to
+                    be used.
+        lam_res:    lambda resolution for trapezoidal integral over lambda.
     '''
     prefac = 1.0
     if L_ref=='minor':
@@ -323,11 +359,24 @@ def calc_AE_salpha(omn,eta,epsilon,q,s_q,alpha,lam_res=1000,L_ref='major',A=3.0,
         epsilon = rho / A   # epsilon = r/R0 = (r/a) / (R0/a) = rho / A
         prefac  = A**(-2)    # rho_g/R_0 = rho_g/a * a/R0 = rho_* / A 
 
-    k2_arr  = np.linspace(0,1,lam_res+2)
-    k2_arr  = k2_arr[1:-1]
-    wlam, K = CHM(k2_arr,s_q,alpha,q)
-    c0              = np.asarray( omn / (wlam) * (1. - 3./2. * eta) )
-    c1              = np.asarray(1. - omn / (wlam) * eta)
-    ae_per_lam      = AE_per_lam(c0,c1,K,wlam)
-    return prefac * 2 * np.sqrt(2)/np.pi * np.sqrt(epsilon) * np.trapz(ae_per_lam,k2_arr)
+
+    if int_meth=='trapz':
+        k2_arr  = np.linspace(0,1,lam_res+2)
+        k2_arr  = k2_arr[1:-1]
+        wlam, K = CHM(k2_arr,s_q,alpha,q)
+        c0              = np.asarray( omn / (wlam) * (1. - 3./2. * eta) )
+        c1              = np.asarray(1. - omn / (wlam) * eta)
+        ae_per_lam      = AE_per_lam(c0,c1,K,wlam)
+        int_res         = np.trapz(ae_per_lam,k2_arr)
+
+    if int_meth=='quad':
+        def quad_int(k2_val):
+            wlam, K = CHM(k2_val,s_q,alpha,q)
+            c0              = np.asarray([ omn / (wlam) * (1. - 3./2. * eta) ])
+            c1              = np.asarray([1. - omn / (wlam) * eta])
+            ae_per_lam      = AE_per_lam(c0,c1,K,wlam)
+            return ae_per_lam
+        int_res, err = quad(quad_int,0,1,epsrel=1e-4)
+
+    return prefac * 2 * np.sqrt(2)/np.pi * np.sqrt(epsilon) * int_res
     
