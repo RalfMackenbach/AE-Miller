@@ -35,7 +35,7 @@ def fmt(x, pos):
 
 
 # Construct grid for total integral
-omn_grid          =  np.logspace(-1, np.log10(20.0), num=100, dtype='float64')
+omn_grid          =  np.linspace(0, 20, num=100, dtype='float64')
 
 
 omnv,  deltav  = np.meshgrid(omn_grid,delta)
@@ -76,9 +76,9 @@ if __name__ == "__main__":
     # print(np.amax(AEv))
     fig = plt.figure(figsize=(6, 2.0)) #figsize=(3.375, 2.3)
     ax  = fig.gca()
-    cnt1 = plt.loglog(omnv[1,:], AEv[1,:],'blue',label=r'$\delta =+0.5$')
-    cnt0 = plt.loglog(omnv[0,:], AEv[0,:],'red',label=r'$\delta = -0.5$')
-    plt.legend()
+    cnt1 = plt.semilogy(omnv[1,:], AEv[1,:],'blue',label=r'$\delta =+0.5$',linestyle='dashed')
+    cnt0 = plt.semilogy(omnv[0,:], AEv[0,:],'red',label=r'$\delta = -0.5$',linestyle='dashdot')
+    plt.legend(loc='lower right')
     # plt.title(r'Available Energy as a function of $s$ and $\alpha$' '\n' r'$\omega_n$={}, $\eta$={}, $\epsilon$={}, $q$={}, $d R_0/ d r$={}, $\kappa$={}, $s_\kappa$={}, $\delta$={}, $s_\delta$={}' '\n'.format(omn,eta,epsilon,q,dR0dr,kappa,s_kappa,delta,s_delta))
     plt.xlabel(r'$\hat{\omega}_n$')
     plt.ylabel(r'$\widehat{A}$')
@@ -93,7 +93,8 @@ if __name__ == "__main__":
     plt.tight_layout()
     # plt.subplots_adjust(left=0.15, right=0.88, top=0.96, bottom=0.14)
     plt.margins(0.1)
-    plt.xlim((1e-1,omn_grid[-1]))
+    plt.xlim((omn_grid.min(),omn_grid.max()))
+    plt.ylim(1e-1,1e2)
     #plt.yscale('log')
     #plt.ylim(bottom=0.01)
     plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/LH/line_plot.png', format='png',
