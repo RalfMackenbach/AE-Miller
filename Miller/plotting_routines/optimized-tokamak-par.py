@@ -35,7 +35,7 @@ kappa_min = 0.5
 kappa_max = 2.0
 delta_min =-0.5
 delta_max = 0.5
-res = 10
+res = 50
 
 s_grid          =   np.linspace(s_min, s_max, num=res, dtype='float64')
 alpha_grid      =   np.linspace(alpha_min, alpha_max, num=res, dtype='float64')

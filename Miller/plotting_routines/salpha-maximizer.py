@@ -17,24 +17,24 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 rc('text', usetex=True)
 
 omn     = 1.0
-eta     = 0
+eta     = 1.0
 epsilon = 1/3
-q       = 2.0
+q       = 3.0
 kappa   = 1.5
 delta   = 0.0
-dR0dr   =-0.5
+dR0dr   = 0.0
 s_q     = 'scan'
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 'scan'
-theta_res   = int(1e3 +1)
-L_ref       = 'major'
-plot_steepest_descent = True
+theta_res   = int(1e3)
+L_ref       = 'minor'
+plot_steepest_descent = False
 
 
 
 
-resolution  = 11
+resolution  = 101
 scan_arr    = np.linspace(-0.5,0.5,resolution)
 s_arr       = np.empty_like(scan_arr)
 alpha_arr   = np.empty_like(scan_arr)
@@ -44,7 +44,7 @@ marker_vert = []
 vals=[0.5,0]
 for idx, val in enumerate(scan_arr):
     print('at step', idx+1, 'out of', len(scan_arr))
-    fun = lambda x: -1*AEtok.calc_AE(omn,eta,epsilon,  q,kappa,  val,dR0dr,x[0],s_kappa,s_delta, x[1],theta_res,L_ref)
+    fun = lambda x: -1*AEtok.calc_AE(omn,eta,epsilon,  q,kappa,  val,dR0dr,x[0],s_kappa,s_delta, x[1],theta_res,L_ref,int_meth='trapz',lam_res=100)
     res = scipy.optimize.minimize(fun, vals)
     vals=res.x
     s_arr[idx] = vals[0]

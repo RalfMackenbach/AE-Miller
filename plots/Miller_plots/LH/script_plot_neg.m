@@ -84,7 +84,7 @@ caxis([AE_min AE_max]);
 c.Label.String = '$\log \widehat{A}$';
 c.Label.Interpreter = 'latex';
 
-txt = '$(a)$: $\delta = -0.5$';
+txt = '$(b)$: $\delta = -0.5$';
 text(15.0,8.0,3.5,txt,'Interpreter','latex')
 
 

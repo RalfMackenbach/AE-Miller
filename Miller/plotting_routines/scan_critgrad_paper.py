@@ -12,10 +12,10 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 #rc('font',**{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)
 
-omn_fac = 1e3
-omn1 = omn_fac*1.0
-omn2 = omn_fac*5.0
-omn3 = omn_fac*10.0
+omn_fac = 1e4
+omn1 = omn_fac*((1+np.sqrt(5))/2)**1
+omn2 = omn_fac*((1+np.sqrt(5))/2)**2
+omn3 = omn_fac*((1+np.sqrt(5))/2)**3
 eta     = 0.0
 epsilon = 1/3
 q       = 2.0
@@ -26,7 +26,7 @@ s_q     = 0.0
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
-theta_res   = int(1e3 +1)
+theta_res   = int(1e3+1)
 L_ref       = 'major'
 
 
