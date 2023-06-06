@@ -11,19 +11,14 @@ from    scipy.integrate         import  quad
 def AE_per_lam(c0,c1,tau_b,wlam):
     r"""
     function containing the integral over z for exactly omnigenous systems.
-    This is the available energy per lambda. 
-    Args:
-        c0:     as in paper
-        c1L     as in paper
-        tau_b:  bounce time
-        wlam:   bounce-averaged drift
+    This is the available energy per lambda.
     """
     condition1 = np.logical_and((c0>=0),(c1<=0))
-    condition2 = np.logical_and((c0>=0),(c1>0) )
-    condition3 = np.logical_and((c0<0), (c1<0) )
+    condition2 = np.logical_and((c0>=0),(c1>0))
+    condition3 = np.logical_and((c0<0),(c1<0))
     ans = np.zeros(len(c1))
     ans[condition1]  = (2 * c0[condition1] - 5 * c1[condition1])
-    ans[condition2]  = (2 * c0[condition2] - 5 * c1[condition2]) *      erf(np.sqrt(c0[condition2]/c1[condition2]))  + 2 / (3 *np.sqrt(np.pi)) * ( 4 * c0[condition2] + 15 * c1[condition2] ) * np.sqrt(c0[condition2]/c1[condition2]) * np.exp( - c0[condition2]/c1[condition2] )
+    ans[condition2]  = (2 * c0[condition2] - 5 * c1[condition2]) * erf(np.sqrt(c0[condition2]/c1[condition2])) + 2 / (3 *np.sqrt(np.pi)) * ( 4 * c0[condition2] + 15 * c1[condition2] ) * np.sqrt(c0[condition2]/c1[condition2]) * np.exp( - c0[condition2]/c1[condition2] )
     ans[condition3]  = (2 * c0[condition3] - 5 * c1[condition3]) * (1 - erf(np.sqrt(c0[condition3]/c1[condition3]))) - 2 / (3 *np.sqrt(np.pi)) * ( 4 * c0[condition3] + 15 * c1[condition3] ) * np.sqrt(c0[condition3]/c1[condition3]) * np.exp( - c0[condition3]/c1[condition3] )
     return ans*tau_b*wlam**2
 
@@ -183,7 +178,7 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
         fluxtube_vol = MC.xi_2 / MC.xi
 
     # I now use the Ansatz C_r = 1.0 instead of q.
-    return prefac * np.sqrt(epsilon) * int_res / fluxtube_vol
+    return prefac * np.sqrt(epsilon) * int_res / fluxtube_vol * 3/16
     
     
 
@@ -302,8 +297,8 @@ def plot_precession(walpha,roots,theta,b_arr,lam_arr,ae_per_lam):
     ax[1].set_xlim(theta.min(),theta.max())
     ax[1].tick_params(axis='both',direction='in')
     plt.subplots_adjust(left=0.1, right=0.88, top=0.99, bottom=0.08)
-    cbar = plt.colorbar(cm.ScalarMappable(norm=mplc.Normalize(vmin=0.0, vmax=max_ae_per_lam, clip=False), cmap=cm.plasma), ticks=[0, max_ae_per_lam], ax=ax[1],location='bottom',label=r'$\widehat{A}_\lambda$') #'%.3f'
-    cbar.ax.set_xticklabels([0, round(max_ae_per_lam, 1)])
+    cbar = plt.colorbar(cm.ScalarMappable(norm=mplc.Normalize(vmin=0.0, vmax=max_ae_per_lam, clip=False), cmap=cm.plasma), ticks=[0, max_ae_per_lam], ax=ax[1],location='bottom',label=r'$\widehat{A}_\lambda/\widehat{A}_{\lambda,\mathrm{max}}$') #'%.3f'
+    cbar.ax.set_xticklabels([0, 1])
     plt.savefig('ae_per_lam.eps', format='eps',
                 #This is recommendation for publication plots
                 dpi=1000,
@@ -358,7 +353,7 @@ def calc_AE_salpha(omn,eta,epsilon,q,s_q,alpha,L_ref='major',A=3.0,rho=1.0,int_m
     if L_ref=='minor':
         omn = A * omn       # R0 * df/dr = R0/a * a df/dr = A * omn
         epsilon = rho / A   # epsilon = r/R0 = (r/a) / (R0/a) = rho / A
-        prefac  = A**(-2)    # rho_g/R_0 = rho_g/a * a/R0 = rho_* / A 
+        prefac  = A**(-2)   # rho_g/R_0 = rho_g/a * a/R0 = rho_* / A 
 
 
     if int_meth=='trapz':
@@ -379,5 +374,5 @@ def calc_AE_salpha(omn,eta,epsilon,q,s_q,alpha,L_ref='major',A=3.0,rho=1.0,int_m
             return ae_per_lam
         int_res, err = quad(quad_int,0,1,epsrel=1e-4)
 
-    return prefac * 2 * np.sqrt(2)/np.pi * np.sqrt(epsilon) * int_res
+    return prefac * 2 * np.sqrt(2)/np.pi * np.sqrt(epsilon) * int_res  * 3/16
     

@@ -34,7 +34,7 @@ def fmt(x, pos):
     b = int(b)
     return r'${} \cdot 10^{{{}}}$'.format(a, b)
 
-res = 10
+res = 100
 
 # Construct grid for total integral
 eps_grid        =  np.logspace(-3,  np.log10(0.5),  num=res)

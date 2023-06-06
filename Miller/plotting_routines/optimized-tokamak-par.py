@@ -35,7 +35,7 @@ kappa_min = 0.5
 kappa_max = 2.0
 delta_min =-0.5
 delta_max = 0.5
-res = 50
+res = 100
 
 s_grid          =   np.linspace(s_min, s_max, num=res, dtype='float64')
 alpha_grid      =   np.linspace(alpha_min, alpha_max, num=res, dtype='float64')
@@ -78,6 +78,15 @@ if __name__ == "__main__":
         delta_opt[idx]    = vals[1]
         AE_opt[idx]       = np.abs(fun)
         list_idx = list_idx+1
+
+    # save the data to hdf5 
+    f = h5py.File('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/optimisation/optimized-tokamak-par.h5', 'w')
+    f.create_dataset('AE_opt', data=AE_opt)
+    f.create_dataset('kappa_opt', data=kappa_opt)
+    f.create_dataset('delta_opt', data=delta_opt)
+    f.create_dataset('sv', data=sv)
+    f.create_dataset('alphav', data=alphav)
+    f.close()
 
     fig, axs = plt.subplots(1,4, figsize=(6.850394, 5.0/2.5)) #figsize=(6.850394, 3.0)
     pAE         = axs[0].pcolor(alphav,sv,AE_opt,cmap='plasma')
