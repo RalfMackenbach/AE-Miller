@@ -152,8 +152,8 @@ if __name__ == "__main__":
     cbar3 = fig.colorbar(cnt3,ticks=[-max_3,max_3],ax=axs[1,1])
     cbar3.set_ticklabels([r'${}$'.format(np.round(-max_3,1)),r'${}$'.format(np.round(max_3,1))])
 
-    cbar1.set_label(r'$\log(\Delta)$')
-    cbar3.set_label(r'$\log(\Delta)$')
+    cbar1.set_label(r'$\log_{10}(\Delta)$')
+    cbar3.set_label(r'$\log_{10}(\Delta)$')
     # cbar.set_label(r'$\widehat{A}$')
     cbar0.solids.set_edgecolor("face")
     cbar1.solids.set_edgecolor("face")

@@ -26,7 +26,7 @@ s_q     = 0.0
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
-theta_res   = int(1e3+1)
+theta_res   = int(1e3)
 L_ref       = 'major'
 
 
@@ -38,7 +38,7 @@ def fmt(x, pos):
     b = int(b)
     return r'${} \cdot 10^{{{}}}$'.format(a, b)
 
-res = 50
+res = 10
 
 s_grid          =  np.linspace(-1.0, +4.0, num=res)
 alpha_grid      =  np.linspace( 0.0, +1.0, num=res)
@@ -115,14 +115,14 @@ if __name__ == "__main__":
     #print(maxsa,minsa,maxkd,minkd)
     levelssa = np.linspace(minsa,maxsa,20)
     levelskd = np.linspace(minkd,maxkd,20)
-    fig, axs = plt.subplots(1,2, figsize=(6.850394, 5.0/2)) #figsize=(6.850394, 3.0)
+    fig, axs = plt.subplots(2,1, figsize=(5.0/1.2,6.850394)) #figsize=(6.850394, 3.0)
     cnt0 = axs[0].contourf(alphav, sv,      critgrad_sa, levels=levelssa, cmap='viridis_r')
     cnt1 = axs[1].contourf(kappav, deltav,  critgrad_kd, levels=levelskd, cmap='viridis_r')
     for c in cnt0.collections:
         c.set_edgecolor("face")
     for c in cnt1.collections:
         c.set_edgecolor("face")
-    cbar0 = fig.colorbar(cnt0,ticks=[minsa,maxsa],ax=axs[0])
+    cbar0 = fig.colorbar(cnt0,ticks=[minsa,maxsa],ax=axs[0],label=r'$\hat{\omega}_c$')
     cbar1 = fig.colorbar(cnt1,ticks=[minkd, maxkd],ax=axs[1],label=r'$\hat{\omega}_c$')
     cbar0.set_ticklabels([fmt(minsa,1),fmt(maxsa,1)])
     cbar1.set_ticklabels([fmt(minkd,1),fmt(maxkd,1)])
@@ -133,8 +133,8 @@ if __name__ == "__main__":
     axs[1].set_xlabel(r'$\kappa$')
     axs[1].set_ylabel(r'$\delta$')
 
-    axs[0].text(1/8, -0.3, r'$(a)$',ha='center', va='center')
-    axs[1].text((2-0.5)/8+0.5, (1.6)/8+-0.8, r'$(b)$',ha='center', va='center')
+    # axs[0].text(1/8, -0.3, r'$(a)$',ha='center', va='center')
+    # axs[1].text((2-0.5)/8+0.5, (1.6)/8+-0.8, r'$(b)$',ha='center', va='center')
     plt.tight_layout()
     plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/crit-grad/contours_critgrad.eps', format='eps',
                 #This is recommendation for publication plots
