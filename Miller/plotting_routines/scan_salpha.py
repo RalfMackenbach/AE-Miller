@@ -1,34 +1,32 @@
-import sys
-sys.path.insert(1, '/Users/ralfmackenbach/Documents/GitHub/AE-tok/Miller/scripts')
+import AEtok.AE_tokamak_calculation as AEtok
 import numpy as np
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
 import h5py
 import matplotlib        as mpl
-import AE_tokamak_calculation as AEtok
 from matplotlib import rc
-import Miller_functions as Mf
 import matplotlib.ticker as ticker
 rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 ## for Palatino and other serif fonts use:
 #rc('font',**{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)
 
-omn     = 1.0
-eta     = 0.0
+omn     = 3.50/3.42
+eta     = 3.09
 epsilon = 1/3
-q       = 2.0
-kappa   = 1.5
-delta   = 0.25
-dR0dr   = -0.15
-s_q     = 'scan'
-s_kappa = 0.7
-s_delta = 0.25
-alpha   = 'scan'
-lam_res     = int(1e3+1)
-L_ref       = 'major'
-
+q       = 2.03
+kappa   = 1.46
+delta   = 0.19
+dR0dr   =-0.14
+s_q     = 1.62
+s_kappa = 0.57
+s_delta = 0.6
+alpha   = 0.0
+theta_res   = int(1e3)
+L_ref       = 'minor'
+A           = 3.42
+rho         = 0.8
 
 
 def fmt(x, pos):
@@ -40,10 +38,12 @@ def fmt(x, pos):
         return r'${}$'.format(a)
 
 
+res = 20
+
 
 # Construct grid for total integral
-s_grid          =  np.linspace(-2.0, +6.0, num=50, dtype='float64')
-alpha_grid      =  np.linspace(-0.5, +0.5, num=50, dtype='float64')
+s_grid          =  np.linspace(-1.0, +5.0, num=res, dtype='float64')
+alpha_grid      =  np.linspace( 0.0, +1.0, num=res, dtype='float64')
 
 
 sv, alphav = np.meshgrid(s_grid, alpha_grid, indexing='ij')
@@ -58,7 +58,7 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],L_ref) for idx, val in np.ndenumerate(AEv)])
+    AE_list = pool.starmap(AEtok.calc_AE, [(omn,eta,epsilon,q,kappa,delta,dR0dr,sv[idx],s_kappa,s_delta,alphav[idx],theta_res,L_ref,A,rho) for idx, val in np.ndenumerate(AEv)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()
@@ -69,7 +69,6 @@ if __name__ == "__main__":
     list_idx = 0
     for idx, val in np.ndenumerate(AEv):
         AEv[idx]    = AE_list[list_idx]
-        alphav[idx] = AE_list[list_idx]
         list_idx    = list_idx + 1
 
     np.save('AE_mat.npy', AEv)    # .npy extension is added if not given
@@ -86,14 +85,14 @@ if __name__ == "__main__":
 
     # levels = np.linspace(0, 4.0, 25)
     # print(np.amax(AEv))
-    levels = np.linspace(0, np.amax(AE_list**(3/2)), 37)
+    levels = np.linspace(0, np.amax(AE_list), 37)
     fig = plt.figure(figsize=(3.375, 2.3)) #figsize=(6.850394, 3.0)
     ax  = fig.gca()
-    cnt = plt.contourf(alphav, sv, AEv**(3/2), levels=levels, cmap='plasma')
+    cnt = plt.contourf(alphav, sv, AEv, levels=levels, cmap='plasma')
     for c in cnt.collections:
         c.set_edgecolor("face")
-    cbar = plt.colorbar(ticks=[0.0, np.amax(AE_list**(3/2))])
-    cbar.set_label(r'$\widehat{A}^{3/2}$')
+    cbar = plt.colorbar(ticks=[0.0, np.amax(AE_list)])
+    cbar.set_label(r'$\widehat{A}$')
     # cbar.set_label(r'$\widehat{A}$')
     cbar.solids.set_edgecolor("face")
     # plt.title(r'Available Energy as a function of $s$ and $\alpha$' '\n' r'$\omega_n$={}, $\eta$={}, $\epsilon$={}, $q$={}, $d R_0/ d r$={}, $\kappa$={}, $s_\kappa$={}, $\delta$={}, $s_\delta$={}' '\n'.format(omn,eta,epsilon,q,dR0dr,kappa,s_kappa,delta,s_delta))

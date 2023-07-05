@@ -11,8 +11,8 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 #rc('font',**{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)
 
-omn     = 1e-10
-eta     = 1e10
+omn     = 3.0
+eta     = 1
 epsilon = 1/3
 q       = 2.0
 kappa   = 'scan'
@@ -22,11 +22,13 @@ s_q     = 2.0
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
-theta_res   = int(1e3+1)
+theta_res   = int(1e3)
 L_ref       = 'minor'
-A           = 3.0
-rho         = 1.0
+A           = 1.0
+rho         = 1/3
 
+
+res = 10
 
 
 def fmt(x, pos):
@@ -37,8 +39,8 @@ def fmt(x, pos):
 
 
 # Construct grid for total integral
-kappa_grid      =  np.linspace(+0.5, +2.0, num=20)
-delta_grid      =  np.linspace(-0.5, +0.5, num=20)
+kappa_grid      =  np.linspace(+0.5, +2.0, num=res)
+delta_grid      =  np.linspace(-0.75, +0.75, num=res)
 
 
 kappav, deltav = np.meshgrid(kappa_grid, delta_grid, indexing='ij')
@@ -67,14 +69,16 @@ if __name__ == "__main__":
         list_idx    = list_idx + 1
 
 
+    AE_plot = AEv**1.5
 
-    levels = np.linspace(0, np.amax(AE_list), 37)
+
+    levels = np.linspace(0, np.amax(AE_plot), 37)
     fig = plt.figure(figsize=(3.375, 2.3))
     ax  = fig.gca()
-    cnt = plt.contourf(kappav, deltav, AEv,levels=levels, cmap='plasma')
+    cnt = plt.contourf(kappav, deltav, AE_plot,levels=levels, cmap='plasma')
     for c in cnt.collections:
         c.set_edgecolor("face")
-    cbar = plt.colorbar(ticks=[0.0, np.amax(AE_list)])
+    cbar = plt.colorbar(ticks=[0.0, np.amax(AE_plot)])
     cbar.set_label(r'$\widehat{A}$')
     # cbar.set_label(r'$\hat{A}$')
     cbar.solids.set_edgecolor("face")

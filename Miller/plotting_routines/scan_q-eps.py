@@ -11,19 +11,19 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 #rc('font',**{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)
 
-omn     = 1.0
+omn     = 3.0
 eta     = 0.0
 epsilon = 'scan'
 q       = 'scan'
-kappa   = 1.0
-delta   = 0.0
+kappa   = 3/2
+delta   =-0.3
 dR0dr   = 0.0
 s_q     = 0.0
 s_kappa = 0.0   
 s_delta = 0.0
 alpha   = 0.0
-theta_res   = int(1e3+1)
-L_ref       = 'minor'
+theta_res   = int(1e3)
+L_ref       = 'major'
 A           = 3.0
 rho         = 0.7
 
@@ -34,11 +34,11 @@ def fmt(x, pos):
     b = int(b)
     return r'${} \cdot 10^{{{}}}$'.format(a, b)
 
-
+res = 100
 
 # Construct grid for total integral
-eps_grid        =  np.logspace(-3,  -0.5,  num=100)
-q_grid          =  np.logspace(-2,   1.0,  num=100)
+eps_grid        =  np.logspace(-3,  np.log10(0.5),  num=res)
+q_grid          =  np.logspace(-1,  1,              num=res)
 
 
 epsv, qv = np.meshgrid(eps_grid, q_grid, indexing='ij')

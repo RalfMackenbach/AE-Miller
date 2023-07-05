@@ -51,7 +51,7 @@ if __name__ == "__main__":
     L_ref = 'major'
     A = 3.0
     rho = 1e-6
-    theta_res=int(1e3+1)
+    theta_res=int(1e3)
 
     # time the full integral
     start_time = time.time()

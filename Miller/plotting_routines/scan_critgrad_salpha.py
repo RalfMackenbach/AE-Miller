@@ -18,17 +18,17 @@ omn2 = omn_fac*5.0
 omn3 = omn_fac*10.0
 eta     = 0.0
 epsilon = 1/3
-q       = 2.0
-kappa   = 2.0
-delta   =-0.8
+q       = 3.0
+kappa   = 3/2
+delta   = -0.2
 dR0dr   = 0.0
 s_q     = 0.0
-s_kappa = 0.0
-s_delta = 0.0
+s_kappa = 0.5
+s_delta = -0.2
 alpha   = 0.0
 theta_res   = int(1e3 +1)
 L_ref       = 'major'
-
+res = 25
 
 
 
@@ -40,8 +40,8 @@ def fmt(x, pos):
 
 
 
-s_grid          =  np.linspace(-1.0, +4.0, num=10, dtype='float64')
-alpha_grid      =  np.linspace( 0.0, +1.0, num=10, dtype='float64')
+s_grid          =  np.linspace(-1.0, +4.0, num=res)
+alpha_grid      =  np.linspace( 0.0, +1.0, num=res)
 
 
 sv, alphav = np.meshgrid(s_grid, alpha_grid, indexing='ij')

@@ -2,9 +2,7 @@ import scipy
 import scipy.special
 from   scipy                import integrate
 import numpy                as np
-from   scipy.integrate      import dblquad, quad
-from   numba                import int32, float32    # import the types
-from   numba.experimental   import jitclass
+from   scipy.integrate      import quad
 
 
 #############################################################################

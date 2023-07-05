@@ -24,8 +24,8 @@ epsilon = 1/3
 
 
 # Construct grid for total integral
-s_grid      =  np.linspace(-5.0, +5.0,   num=200)
-alpha_grid   = np.linspace(-5.0, +5.0,   num=200)
+s_grid      =  np.linspace(-5.0, +5.0,   num=100)
+alpha_grid   = np.linspace(-5.0, +5.0,   num=100)
 
 
 sv, alphav     = np.meshgrid(s_grid, alpha_grid, indexing='ij')
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     cbar1.set_ticklabels([fmt(min_level),fmt(max_level)])
     cbar0.solids.set_edgecolor("face")
     cbar1.solids.set_edgecolor("face")
-    cbar1.set_label(r'$\log \widehat{A}$')
+    cbar1.set_label(r'$\log_{10} \widehat{A}$')
     axs[0].set_xlabel(r'$\alpha$')
     axs[1].set_xlabel(r'$\alpha$')
     axs[0].set_ylabel(r'$s$')

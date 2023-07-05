@@ -11,19 +11,14 @@ from    scipy.integrate         import  quad
 def AE_per_lam(c0,c1,tau_b,wlam):
     r"""
     function containing the integral over z for exactly omnigenous systems.
-    This is the available energy per lambda. 
-    Args:
-        c0:     as in paper
-        c1L     as in paper
-        tau_b:  bounce time
-        wlam:   bounce-averaged drift
+    This is the available energy per lambda.
     """
     condition1 = np.logical_and((c0>=0),(c1<=0))
-    condition2 = np.logical_and((c0>=0),(c1>0) )
-    condition3 = np.logical_and((c0<0), (c1<0) )
+    condition2 = np.logical_and((c0>=0),(c1>0))
+    condition3 = np.logical_and((c0<0),(c1<0))
     ans = np.zeros(len(c1))
     ans[condition1]  = (2 * c0[condition1] - 5 * c1[condition1])
-    ans[condition2]  = (2 * c0[condition2] - 5 * c1[condition2]) *      erf(np.sqrt(c0[condition2]/c1[condition2]))  + 2 / (3 *np.sqrt(np.pi)) * ( 4 * c0[condition2] + 15 * c1[condition2] ) * np.sqrt(c0[condition2]/c1[condition2]) * np.exp( - c0[condition2]/c1[condition2] )
+    ans[condition2]  = (2 * c0[condition2] - 5 * c1[condition2]) * erf(np.sqrt(c0[condition2]/c1[condition2])) + 2 / (3 *np.sqrt(np.pi)) * ( 4 * c0[condition2] + 15 * c1[condition2] ) * np.sqrt(c0[condition2]/c1[condition2]) * np.exp( - c0[condition2]/c1[condition2] )
     ans[condition3]  = (2 * c0[condition3] - 5 * c1[condition3]) * (1 - erf(np.sqrt(c0[condition3]/c1[condition3]))) - 2 / (3 *np.sqrt(np.pi)) * ( 4 * c0[condition3] + 15 * c1[condition3] ) * np.sqrt(c0[condition3]/c1[condition3]) * np.exp( - c0[condition3]/c1[condition3] )
     return ans*tau_b*wlam**2
 
@@ -69,7 +64,7 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
      Args:
         omn:        -R0 * d ln(n) / dr
         eta:        ratio of (dln(T)/dr) / (dln(n)/dr)
-        epsilon:    r/R0, where r is the location of the flux surface.
+        epsilon:    r/R0, where r is the location of the flux surface. Ignored if L_ref is 'minor'
         q:          safety factor
         kappa:      elongation
         delta:      triangularity
@@ -88,7 +83,7 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
         rho:        Normalized radial location r/a, only needed if L_ref='minor'
         int_meth:   Integration method over lambda. 'trapz' uses trapezoidal rule,
                     'quad' uses quadrature. If 'trapz', one can set the resolution
-                    via lam_res. If one wants to plot AE per lambda, trapz needs to
+                    via lam_res. If one wants to use plot_precs, trapz needs to
                     be used.
         lam_res:    lambda resolution for trapezoidal integral over lambda.
         plot_precs: Boolean. If set to True, one plots the AE per lambda.
@@ -136,7 +131,7 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
 
         for idx, lam_val in enumerate(lam_arr):
             averaging_arr   = ( 2. * ( 1. - lam_val*b_arr ) * ( rdbdrho - rdbpdrho - 1./Rc ) - lam_val * b_arr * rdbdrho ) / ( MC.epsilon * bps * Rs )
-            dldtheta        =  l_theta * b_arr / bps
+            dldtheta        = l_theta * b_arr / bps
             f_arr_numer     = averaging_arr * dldtheta
             f_arr_denom     = l_theta * b_arr/ bps
             f               = 1 - lam_val * b_arr
@@ -183,7 +178,7 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
         fluxtube_vol = MC.xi_2 / MC.xi
 
     # I now use the Ansatz C_r = 1.0 instead of q.
-    return prefac * np.sqrt(epsilon) * int_res / fluxtube_vol
+    return prefac * np.sqrt(epsilon) * int_res / fluxtube_vol * 3/16
     
     
 
@@ -214,12 +209,12 @@ def plot_precession(walpha,roots,theta,b_arr,lam_arr,ae_per_lam):
         wpsi_arr[i][0:len(j)] = j
     alp_l  = np.shape(walp_arr)[1]
     k2_arr = np.repeat(k2,alp_l)
-    fig, ax = plt.subplots(2, 1, tight_layout=True, figsize=(2*3.5, 5.0))
-    ax[1].scatter(k2_arr,walp_arr,s=0.2,marker='.',color='black',facecolors='black')
-    ax[1].plot(k2,0.0*k2,color='red',linestyle='dashed')
-    ax[1].set_xlim(0,1)
-    ax[1].set_xlabel(r'$k^2$')
-    ax[1].set_ylabel(r'$\omega_\lambda$',color='black')
+    fig, ax = plt.subplots(2, 1, figsize=(2*3.5, 5.0),gridspec_kw={'height_ratios': [1.2, 2]})
+    ax[0].scatter(k2_arr,walp_arr,s=0.2,marker='.',color='black',facecolors='black')
+    ax[0].plot(k2,0.0*k2,color='red',linestyle='dashed')
+    ax[0].set_xlim(0,1)
+    ax[0].set_xlabel(r'$k^2$')
+    ax[0].set_ylabel(r'$\omega_\lambda$',color='black')
 
 
     # now do plot as a function of bounce-angle
@@ -234,37 +229,37 @@ def plot_precession(walpha,roots,theta,b_arr,lam_arr,ae_per_lam):
             walpha_bounceplot.extend([walpha_at_lam[idx]])
 
     roots_ordered, walpha_bounceplot = (list(t) for t in zip(*sorted(zip(roots_bounceplot, walpha_bounceplot))))
-    ax[0].plot(theta,b_arr,color='black')
-    ax001= ax[0].twinx()
-    ax001.plot(roots_ordered,walpha_bounceplot,color='tab:blue')
-    ax001.plot(np.asarray(roots_ordered),0.0*np.asarray(walpha_bounceplot),color='tab:red',linestyle='dashed')
-    ax[0].set_xlim(theta.min(),theta.max())
-    ax[0].set_xlabel(r'$\theta$')
-    ax[0].set_ylabel(r'$B$')
-    ax001.set_ylabel(r'$\omega_\lambda$',color='tab:blue')
-    plt.savefig('prec.eps', format='eps',
-                #This is recommendation for publication plots
-                dpi=1000,
-                # Plot will be occupy a maximum of available space
-                bbox_inches='tight')
-    plt.show()
+    # ax[0].plot(theta,b_arr,color='black')
+    # ax001= ax[0].twinx()
+    # ax001.plot(roots_ordered,walpha_bounceplot,color='tab:blue')
+    # ax001.plot(np.asarray(roots_ordered),0.0*np.asarray(walpha_bounceplot),color='tab:red',linestyle='dashed')
+    # ax[0].set_xlim(theta.min(),theta.max())
+    # ax[0].set_xlabel(r'$\theta$')
+    # ax[0].set_ylabel(r'$B$')
+    # ax001.set_ylabel(r'$\omega_\lambda$',color='tab:blue')
+    # plt.savefig('prec.eps', format='eps',
+    #             #This is recommendation for publication plots
+    #             dpi=1000,
+    #             # Plot will be occupy a maximum of available space
+    #             bbox_inches='tight')
+    # plt.show()
 
 
 
-    import matplotlib.pyplot as plt
-    import matplotlib        as mpl
-    from    matplotlib   import cm
-    import  matplotlib.colors   as      mplc
-    plt.close('all')
+    # import matplotlib.pyplot as plt
+    # import matplotlib        as mpl
+    # from    matplotlib   import cm
+    # import  matplotlib.colors   as      mplc
+    # plt.close('all')
 
-    font = {'family': 'sans-serif',
-            'weight': 'normal',
-            'size': 10}
+    # font = {'family': 'sans-serif',
+    #         'weight': 'normal',
+    #         'size': 10}
 
-    mpl.rc('font', **font)
-    c = 0.5
-    fig ,ax = plt.subplots()
-    fig.set_size_inches(5/6*6, 5/6*3.5)
+    # mpl.rc('font', **font)
+    # c = 0.5
+    # fig ,ax = plt.subplots()
+    # fig.set_size_inches(5/6*6, 5/6*3.5)
 
     lam_arr   = np.asarray(lam_arr).flatten()
     ae_per_lam = ae_per_lam
@@ -285,24 +280,25 @@ def plot_precession(walpha,roots,theta,b_arr,lam_arr,ae_per_lam):
             bws = roots[idx_lam]
             # check if well crosses boundary
             if(bws[2*idx_bw] > bws[2*idx_bw+1]):
-                ax.plot([bws[2*idx_bw], max(theta)], [b_val, b_val], color=colors_plot[idx_lam][idx_bw])
-                ax.plot([min(theta), bws[2*idx_bw+1]], [b_val, b_val],color=colors_plot[idx_lam][idx_bw])
+                ax[1].plot([bws[2*idx_bw], max(theta)], [b_val, b_val], color=colors_plot[idx_lam][idx_bw])
+                ax[1].plot([min(theta), bws[2*idx_bw+1]], [b_val, b_val],color=colors_plot[idx_lam][idx_bw])
             # if not normal plot
             else:
-                ax.plot([bws[2*idx_bw], bws[2*idx_bw+1]], [b_val, b_val], color=colors_plot[idx_lam][idx_bw])
+                ax[1].plot([bws[2*idx_bw], bws[2*idx_bw+1]], [b_val, b_val], color=colors_plot[idx_lam][idx_bw])
 
-    ax.plot(theta,b_arr,color='black',linewidth=2)
-    ax2 = ax.twinx()
+    ax[1].plot(theta,b_arr,color='black',linewidth=2)
+    ax2 = ax[1].twinx()
     ax2.plot(roots_ordered, walpha_bounceplot, 'red')
-    ax.set_ylabel(r'$B$')
+    ax[1].set_ylabel(r'$B$')
     ax2.set_ylabel(r'$\omega_\lambda$',color='red')
     ax2.plot(theta,theta*0.0,linestyle='dashed',color='red')
     ax2.tick_params(axis='y', colors='black',labelcolor='red',direction='in')
-    ax.set_xlabel(r'$\theta/\pi$')
-    ax.tick_params(axis='both',direction='in')
+    ax[1].set_xlabel(r'$\theta$')
+    ax[1].set_xlim(theta.min(),theta.max())
+    ax[1].tick_params(axis='both',direction='in')
     plt.subplots_adjust(left=0.1, right=0.88, top=0.99, bottom=0.08)
-    cbar = plt.colorbar(cm.ScalarMappable(norm=mplc.Normalize(vmin=0.0, vmax=max_ae_per_lam, clip=False), cmap=cm.plasma), ticks=[0, max_ae_per_lam], ax=ax,location='bottom',label=r'$\widehat{A}_\lambda$') #'%.3f'
-    cbar.ax.set_xticklabels([0, round(max_ae_per_lam, 1)])
+    cbar = plt.colorbar(cm.ScalarMappable(norm=mplc.Normalize(vmin=0.0, vmax=max_ae_per_lam, clip=False), cmap=cm.plasma), ticks=[0, max_ae_per_lam], ax=ax[1],location='bottom',label=r'$\widehat{A}_\lambda/\widehat{A}_{\lambda,\mathrm{max}}$') #'%.3f'
+    cbar.ax.set_xticklabels([0, 1])
     plt.savefig('ae_per_lam.eps', format='eps',
                 #This is recommendation for publication plots
                 dpi=1000,
@@ -357,7 +353,7 @@ def calc_AE_salpha(omn,eta,epsilon,q,s_q,alpha,L_ref='major',A=3.0,rho=1.0,int_m
     if L_ref=='minor':
         omn = A * omn       # R0 * df/dr = R0/a * a df/dr = A * omn
         epsilon = rho / A   # epsilon = r/R0 = (r/a) / (R0/a) = rho / A
-        prefac  = A**(-2)    # rho_g/R_0 = rho_g/a * a/R0 = rho_* / A 
+        prefac  = A**(-2)   # rho_g/R_0 = rho_g/a * a/R0 = rho_* / A 
 
 
     if int_meth=='trapz':
@@ -378,5 +374,5 @@ def calc_AE_salpha(omn,eta,epsilon,q,s_q,alpha,L_ref='major',A=3.0,rho=1.0,int_m
             return ae_per_lam
         int_res, err = quad(quad_int,0,1,epsrel=1e-4)
 
-    return prefac * 2 * np.sqrt(2)/np.pi * np.sqrt(epsilon) * int_res
+    return prefac * 2 * np.sqrt(2)/np.pi * np.sqrt(epsilon) * int_res  * 3/16
     

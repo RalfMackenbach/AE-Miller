@@ -24,7 +24,7 @@ dR0dr   =-0.5
 s_kappa = 0.0
 s_delta = 0.0
 theta_res   = int(1e3+1)
-L_ref       = 'minor'
+L_ref       = 'major'
 A = 3.0
 rho = 1.0
 s_min = -1.0
@@ -35,7 +35,7 @@ kappa_min = 0.5
 kappa_max = 2.0
 delta_min =-0.5
 delta_max = 0.5
-res = 2
+res = 4
 
 s_grid          =   np.linspace(s_min, s_max, num=res, dtype='float64')
 alpha_grid      =   np.linspace(alpha_min, alpha_max, num=res, dtype='float64')
@@ -79,12 +79,12 @@ if __name__ == "__main__":
         AE_opt[idx]       = np.abs(fun)
         list_idx = list_idx+1
 
-    fig, axs = plt.subplots(1,4, figsize=(6.850394, 5.0/2)) #figsize=(6.850394, 3.0)
+    fig, axs = plt.subplots(1,4, figsize=(6.850394, 5.0/2.5)) #figsize=(6.850394, 3.0)
     pAE         = axs[0].pcolor(alphav,sv,AE_opt,cmap='plasma')
     pAE.set_edgecolor('face')
-    cbarae   = fig.colorbar(-1*pAE, ticks=[np.amin(AE_opt),np.amax(AE_opt)], ax=axs[0],orientation="horizontal",pad=0.3,label=r'$\widehat{A}$')
+    cbarae   = fig.colorbar(pAE, ticks=[np.amin(AE_opt),np.amax(AE_opt)], ax=axs[0],orientation="horizontal",pad=0.3,label=r'$\widehat{A}$')
     cbarae.set_ticks(ticks=[np.amin(AE_opt),np.amax(AE_opt)])
-    cbarae.set_ticklabels([fmt(np.amin(-1*AE_opt),1),fmt(np.amax(-1*AE_opt),1)])
+    cbarae.set_ticklabels([fmt(np.amin(AE_opt),1),fmt(np.amax(AE_opt),1)])
     pkappa      = axs[1].pcolor(alphav,sv,kappa_opt,cmap='viridis')
     pkappa.set_edgecolor('face')
     cbarkappa   = fig.colorbar(pkappa, ticks=[kappa_min,kappa_max], ax=axs[1],orientation="horizontal",pad=0.3,label=r'$\kappa$')
@@ -103,6 +103,9 @@ if __name__ == "__main__":
     cbarcat.set_ticks(ticks=[0.5,1.5,2.5,3.5],labels=[r'$\mathrm{NC}$',r'$\mathrm{NT}$',r'$\mathrm{PT}$',r'$\mathrm{PC}$'])
 
     axs[0].set_ylabel(r'$s$')
+    axs[1].set_ylabel(r'$s$')
+    axs[2].set_ylabel(r'$s$')
+    axs[3].set_ylabel(r'$s$')
     axs[0].set_xlabel(r'$\alpha$')
     axs[1].set_xlabel(r'$\alpha$')
     axs[2].set_xlabel(r'$\alpha$')
@@ -120,7 +123,7 @@ if __name__ == "__main__":
     axs[2].text(0.8,-0.5,r'$(c)$')
     axs[3].text(0.8,-0.5,r'$(d)$')
     plt.tight_layout()
-    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/optimisation/optimized-triptych.eps', format='eps',
+    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/optimisation/antioptimized-salpha.eps', format='eps',
                 #This is recommendation for publication plots
                 dpi=1000,
                 # Plot will be occupy a maximum of available space
