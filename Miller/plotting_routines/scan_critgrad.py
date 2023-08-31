@@ -98,7 +98,7 @@ if __name__ == "__main__":
     logval = (np.log10(AE_list[-1])-np.log10(AE_list[0]))/10 + np.log10(AE_list[0])
     axs[0].text(1e2, 10**logval, r'$(a)$')
     plt.tight_layout()
-    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/crit-grad/example.eps', format='eps',
+    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/crit-grad/example.png', format='png',
                 #This is recommendation for publication plots
                 dpi=1000,
                 # Plot will be occupy a maximum of available space

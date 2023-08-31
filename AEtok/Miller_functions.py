@@ -85,6 +85,9 @@ class MC:
         C3,     C3_err      = quad(lambda theta: 1.0/(2.0*np.pi) * ltheta(theta,self) /(R_s(theta,self)**2 * bps(theta,self)**3),                   -np.pi, np.pi)
         C4,     C4_err      = quad(lambda theta: 1.0/(2.0*np.pi) * ltheta(theta,self) /(R_s(theta,self)**4 * bps(theta,self)**3),                   -np.pi, np.pi)
 
+        # also calculate the toroidal flux
+        psi_tor, psi_tor_err= quad(lambda theta: 2.0/(np.pi) * Z_s(theta,self)/self.epsilon * dRs_dtheta(theta,self)/R_s(theta,self), 0, np.pi)
+
         # and assign to self
         self.gamma          = gamma
         self.C1             = C1
@@ -101,6 +104,7 @@ class MC:
         self.xi             = xi
         self.xi_2           = xi_2
         self.xi_3           = xi_3
+        self.psi_tor        = psi_tor
 
 
 #############################################################################
@@ -153,8 +157,14 @@ def rdbpdrho(theta,MC):
 def rdbtdrho(theta,MC):
     return MC.epsilon * (  MC.gamma**2 *MC.epsilon / MC.q**2.0 * ( MC.sigma + MC.alpha/(2*MC.epsilon) ) * R_s(theta,MC) * bps(theta,MC) - sinu(theta,MC)/R_s(theta,MC) )
 
+# radial derivative of total field
 def rdbdrho(theta,MC):
     return ( bts(theta,MC)**2 * rdbtdrho(theta,MC) + (MC.gamma * MC.epsilon / MC.q * bps(theta,MC))**2 * rdbpdrho(theta,MC) ) / bs(theta,MC)**2
 
+# the y component of the flux surface, divided by R0
 def Z_s(theta,MC):
     return MC.epsilon*MC.kappa*np.sin(theta)
+
+# the poloidal derivative of the y component of the flux surface, divided by R
+def dRs_dtheta(theta,MC):
+    return (1 + MC.x*np.cos(theta)) * np.sin(theta + MC.x * np.sin(theta))

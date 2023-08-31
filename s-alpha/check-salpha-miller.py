@@ -1,10 +1,10 @@
-import AEtok.AE_tokamak_calculation as AEtok
-import numpy as np
-import multiprocessing as mp
-import time
-import matplotlib.pyplot as plt
-import matplotlib        as mpl
-from matplotlib import rc
+from    matplotlib                      import  rc
+import  AEtok.AE_tokamak_calculation    as      AEtok
+import  numpy                           as      np
+import  multiprocessing                 as      mp
+import  matplotlib.pyplot               as      plt
+import  matplotlib                      as      mpl
+import  time
 
 
 
@@ -134,7 +134,7 @@ if __name__ == "__main__":
     plt.tight_layout()
     # plt.subplots_adjust(left=0.15, right=0.88, top=0.96, bottom=0.14)
     plt.margins(0.1)
-    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/s-alpha/code-comparison.eps', format='eps',
+    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/s-alpha/code-comparison.png', format='png',
                 #This is recommendation for publication plots
                 dpi=1000,
                 # Plot will be occupy a maximum of available space

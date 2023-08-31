@@ -22,7 +22,7 @@ q       = 2.0
 kappa   = 3/2
 delta   = 0.5
 dR0dr   = 0.0
-s_q     = 0.0
+s_q     = 1.0
 s_kappa = 0.0
 s_delta = 0.0
 alpha   = 0.0
@@ -34,13 +34,12 @@ L_ref       = 'major'
 
 
 def fmt(x, pos):
-    a, b = '{:.1e}'.format(x).split('e')
-    b = int(b)
-    return r'${} \cdot 10^{{{}}}$'.format(a, b)
+    a = round(x,pos)
+    return r'${}$'.format(a)
 
-res = 10
+res = 50
 
-s_grid          =  np.linspace(-1.0, +4.0, num=res)
+s_grid          =  np.linspace(-1.0, +5.0, num=res)
 alpha_grid      =  np.linspace( 0.0, +1.0, num=res)
 
 kappa_grid      =  np.linspace(+0.5, +2.0, num=res)
@@ -113,30 +112,43 @@ if __name__ == "__main__":
     max  = np.nanmax([maxsa,maxkd])
     min  = np.nanmin([minsa,minkd])
     #print(maxsa,minsa,maxkd,minkd)
-    levelssa = np.linspace(minsa,maxsa,20)
-    levelskd = np.linspace(minkd,maxkd,20)
-    fig, axs = plt.subplots(2,1, figsize=(5.0/1.2,6.850394)) #figsize=(6.850394, 3.0)
+    levelssa = np.linspace(min,max,30)
+    levelskd = np.linspace(min,max,30)
+    plt.rcParams['figure.constrained_layout.use'] = True
+    fig, axs = plt.subplots(1,2, figsize=(6.850394,2.5)) #figsize=(6.850394, 3.0)
     cnt0 = axs[0].contourf(alphav, sv,      critgrad_sa, levels=levelssa, cmap='viridis_r')
     cnt1 = axs[1].contourf(kappav, deltav,  critgrad_kd, levels=levelskd, cmap='viridis_r')
     for c in cnt0.collections:
         c.set_edgecolor("face")
     for c in cnt1.collections:
         c.set_edgecolor("face")
-    cbar0 = fig.colorbar(cnt0,ticks=[minsa,maxsa],ax=axs[0],label=r'$\hat{\omega}_c$')
-    cbar1 = fig.colorbar(cnt1,ticks=[minkd, maxkd],ax=axs[1],label=r'$\hat{\omega}_c$')
+    cbar0 = fig.colorbar(cnt0,ticks=[minsa,maxsa],ax=axs.ravel().tolist(),label=r'$\hat{\omega}_c$')
+    # cbar1 = fig.colorbar(cnt1,ticks=[minkd,maxkd],ax=axs[1],label=r'$\hat{\omega}_c$')
     cbar0.set_ticklabels([fmt(minsa,1),fmt(maxsa,1)])
-    cbar1.set_ticklabels([fmt(minkd,1),fmt(maxkd,1)])
+    # cbar1.set_ticklabels([fmt(minkd,1),fmt(maxkd,1)])
     cbar0.solids.set_edgecolor("face")
-    cbar1.solids.set_edgecolor("face")
+    # cbar1.solids.set_edgecolor("face")
     axs[0].set_xlabel(r'$\alpha$')
     axs[0].set_ylabel(r'$s$')
     axs[1].set_xlabel(r'$\kappa$')
     axs[1].set_ylabel(r'$\delta$')
+    
+    # set x and y values of text consistently for the differing domains
+    xt = 0.12
+    yt = 0.12
 
-    # axs[0].text(1/8, -0.3, r'$(a)$',ha='center', va='center')
-    # axs[1].text((2-0.5)/8+0.5, (1.6)/8+-0.8, r'$(b)$',ha='center', va='center')
-    plt.tight_layout()
-    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/crit-grad/contours_critgrad.eps', format='eps',
+
+    x_sa = 0 + xt*1
+    y_sa = -1 + 6 * xt
+    x_kd = 0.5 + 1.5 * yt
+    y_kd = -0.8 + 1.6 * yt
+
+    axs[0].text(x_sa,y_sa,r'$(a)$',horizontalalignment='center',verticalalignment='center')
+    axs[1].text(x_kd,y_kd,r'$(b)$',horizontalalignment='center',verticalalignment='center')
+
+    
+
+    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/crit-grad/contours_critgrad.png', format='png',
                 #This is recommendation for publication plots
                 dpi=1000,
                 # Plot will be occupy a maximum of available space

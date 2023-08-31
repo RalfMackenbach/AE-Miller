@@ -12,11 +12,11 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 #rc('font',**{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)
 
-omn     = 'scan'
+omn     ='scan'
 eta     = 0.0
 epsilon = 1/3
 q       = 3.0
-kappa   = 1.5
+kappa   = 3/2
 delta   = np.asarray([-0.5,0.5])
 dR0dr   =-0.5
 s_kappa = 0.5
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     # plt.subplots_adjust(left=0.15, right=0.88, top=0.96, bottom=0.14)
     plt.margins(0.1)
     plt.xlim((omn_grid.min(),omn_grid.max()))
-    plt.ylim(1e-1,1e2)
+    plt.ylim(1e-2,1e1)
     #plt.yscale('log')
     #plt.ylim(bottom=0.01)
     plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/LH/line_plot.png', format='png',

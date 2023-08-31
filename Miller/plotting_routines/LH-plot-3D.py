@@ -11,7 +11,7 @@ eta     = 0.0
 epsilon = 1/3
 q       = 3.0
 kappa   = 1.5
-delta   =-0.5
+delta   =+0.5
 dR0dr   =-0.5
 s_kappa = 0.5
 s_delta = delta/np.sqrt(1-delta**2)
@@ -19,7 +19,7 @@ theta_res   = int(1e3+1)
 L_ref       = 'major'
 
 
-res = 30
+res = 50
 
 
 def fmt(x, pos):
@@ -68,3 +68,5 @@ if __name__ == "__main__":
     hf.create_dataset('alphav', data=alphav)
     hf.create_dataset('AEv',    data=AEv)
     hf.close()
+
+

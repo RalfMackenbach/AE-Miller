@@ -31,8 +31,8 @@ rho = 0.5
 
 
 # Construct grid for total integral
-s_grid      =  np.linspace(-5.0, +5.0,   num=200)
-alpha_grid   = np.linspace(-5.0, +5.0,   num=200)
+s_grid      =  np.linspace(-5.0, +5.0,   num=50)
+alpha_grid   = np.linspace(-5.0, +5.0,   num=50)
 
 
 sv, alphav     = np.meshgrid(s_grid, alpha_grid, indexing='ij')
@@ -62,11 +62,11 @@ if __name__ == "__main__":
 
     scale=0.7
     fig, ax = plt.subplots(1,1, figsize=(scale*6.850394, scale*5.0))
-    cnt = plt.contourf(alphav, sv, np.log(AEv), 25, cmap='plasma')
+    cnt = plt.contourf(alphav, sv, AEv, 25, cmap='plasma')
     for c in cnt.collections:
         c.set_edgecolor("face")
     cbar = plt.colorbar()
-    cbar.set_label(r'$\ln \widehat{A}$')
+    cbar.set_label(r'$\widehat{A}$')
     cbar.solids.set_edgecolor("face")
     plt.xlabel(r'$\alpha$')
     plt.ylabel(r'$s$')
@@ -80,4 +80,5 @@ if __name__ == "__main__":
                 dpi=1000,
                 # Plot will be occupy a maximum of available space
                 bbox_inches='tight', pad_inches = 0.01)
+    print('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/s-alpha/s-alpha_paper.eps')
     plt.show()

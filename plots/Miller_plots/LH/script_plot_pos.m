@@ -33,8 +33,8 @@ AE_mat      = h5read(name, '/AEv' );
 
 AE_mat = log10(AE_mat);
 
-AE_max = 2;
-AE_min = -1 ;
+AE_max = +0.5;
+AE_min = -2.5 ;
 
 AE_space = linspace(AE_min,AE_max,6);
 
@@ -68,7 +68,7 @@ isonormals(omn_mat,alpha_mat,s_mat,AE_mat,p4);
 set(p4,'FaceColor','[0.9411    0.3562    0.0705]','EdgeColor','none','FaceAlpha',alpha0); % set the color
 
 daspect([4,2,1]);
-xlabel('$\tilde{\omega}_n$','Interpreter','latex');
+xlabel('$\hat{\omega}_n$','Interpreter','latex');
 ylabel('$\alpha$','Interpreter','latex');
 zlabel('$s$','Interpreter','latex');
 grid on;
@@ -81,7 +81,7 @@ view([137 20]);
 colormap(turbo);
 c = colorbar;
 caxis([AE_min AE_max]);
-c.Label.String = '$\log \widehat{A}$';
+c.Label.String = '$\log_{10} \widehat{A}$';
 c.Label.Interpreter = 'latex';
 
 txt = '$(a)$: $\delta = +0.5$';
@@ -91,4 +91,4 @@ text(15.0,8.0,3.5,txt,'Interpreter','latex')
 fontname(gcf,"CMU Serif")
 
 set(gcf, 'Units', 'Inches', 'Position', [0, 0, 6, 2.1]);
-exportgraphics(gcf,'LH-plot-postriangle.png','Resolution',2000)
+exportgraphics(gcf,'LH-plot-postriangle.png','Resolution',1000)
