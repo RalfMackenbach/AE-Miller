@@ -15,7 +15,7 @@ omn     = 1.0
 eta     = 0.0
 epsilon = 1/3
 q       = 2.0
-kappa   = 1.5
+kappa   = 3/2
 delta   = 0.5
 dR0dr   = 0.0
 s_q     = 'scan'
@@ -28,19 +28,15 @@ L_ref       = 'major'
 
 
 
-def fmt(x, pos):
-    a, b = '{:.1e}'.format(x).split('e')
-    b = int(b)
-    if b != 0:
-        return r'${} \cdot 10^{{{}}}$'.format(a, b)
-    if b == 0:
-        return r'${}$'.format(a)
+def fmt(x, pos=1):
+    x = np.round(x,pos)
+    return r'${}$'.format(x)
 
 
-res = 50
+res = 100
 
 # Construct grid for total integral
-s_grid          =  np.linspace(-2.0, +2.0, num=res)
+s_grid          =  np.linspace(-1.0, +5.0, num=res)
 alpha_grid      =  np.linspace(+0.0, +2.0, num=res)
 
 
@@ -84,31 +80,43 @@ if __name__ == "__main__":
         AEv_3[idx]  = AE_list_3[list_idx]
         list_idx    = list_idx + 1
 
+    # remap AE to log10
+    AEv_0 = np.nan_to_num(np.log10(AEv_0),neginf=-20)
+    AEv_1 = np.nan_to_num(np.log10(AEv_1),neginf=-20)
+    AEv_2 = np.nan_to_num(np.log10(AEv_2),neginf=-20)
+    AEv_3 = np.nan_to_num(np.log10(AEv_3),neginf=-20)
 
-
-
-    # theta = np.linspace(0,np.pi*2,theta_res)
-    # f = plt.figure(1)
-    # plt.plot(1 + epsilon*np.cos(theta + np.arcsin(delta)*np.sin(theta)), epsilon*kappa*np.sin(theta))
-    # plt.axis('equal')
-    # plt.title("Flux surface")
-    # plt.xlabel(r'$R/R_0$')
-    # plt.ylabel(r'$Z/R_0$')
-
-    # print(np.amax(AEv))
+    # find max and min values for colorbar
     AE_max_0 = np.amax(AEv_0)
     AE_max_1 = np.amax(AEv_1)
     AE_max_2 = np.amax(AEv_2)
     AE_max_3 = np.amax(AEv_3)
-    levels0 = np.linspace(0, AE_max_0, 25)
-    levels1 = np.linspace(0, AE_max_1, 25)
-    levels2 = np.linspace(0, AE_max_2, 25)
-    levels3 = np.linspace(0, AE_max_3, 25)
-    fig, axs = plt.subplots(2,2, figsize=(6.850394, 5.0)) #figsize=(6.850394, 3.0)
-    cnt0 = axs[0,0].contourf(alphav, sv, AEv_0, levels=levels0, cmap='plasma')
-    cnt1 = axs[0,1].contourf(alphav, sv, AEv_1, levels=levels1, cmap='plasma')
+    AE_min_0 = np.amin(AEv_0)
+    AE_min_1 = np.amin(AEv_1)
+    AE_min_2 = np.amin(AEv_2)
+    AE_min_3 = np.amin(AEv_3)
+
+    # find overall max and min values for colorbar
+    AE_max = np.max([AE_max_0,AE_max_1,AE_max_2,AE_max_3])
+    # override min since log10(0) = -inf
+    AE_min = -3 #np.min([AE_min_0,AE_min_1,AE_min_2,AE_min_3])
+
+    # set contour levels
+    levels0 = np.linspace(AE_min, AE_max, 30)
+    levels1 = np.linspace(AE_min, AE_max, 30)
+    levels2 = np.linspace(AE_min, AE_max, 30)
+    levels3 = np.linspace(AE_min, AE_max, 30)
+
+    # make figure
+    fig, axs = plt.subplots(2,2, figsize=(6.850394, 5.0))
+
+    # plot data
+    cnt0 = axs[0,0].contourf(alphav, sv, AEv_0, levels=levels0, cmap='plasma',extend='min')
+    cnt1 = axs[0,1].contourf(alphav, sv, AEv_1, levels=levels1, cmap='plasma',extend='min')
     cnt2 = axs[1,0].contourf(alphav, sv, AEv_2, levels=levels2, cmap='plasma')
-    cnt3 = axs[1,1].contourf(alphav, sv, AEv_3, levels=levels3, cmap='plasma')
+    cnt3 = axs[1,1].contourf(alphav, sv, AEv_3, levels=levels3, cmap='plasma',extend='min')
+
+    # set edgecolor to facecolor
     for c in cnt0.collections:
         c.set_edgecolor("face")
     for c in cnt1.collections:
@@ -117,23 +125,31 @@ if __name__ == "__main__":
         c.set_edgecolor("face")
     for c in cnt3.collections:
         c.set_edgecolor("face")
-    cbar0 = fig.colorbar(cnt0,ticks=[0.0, AE_max_0],ax=axs[0,0])
-    cbar0.set_ticklabels([r'$0$', fmt(AE_max_0,1)])
-    cbar1 = fig.colorbar(cnt1,ticks=[0.0, AE_max_1],ax=axs[0,1])
-    cbar1.set_ticklabels([r'$0$', fmt(AE_max_1,1)])
-    cbar2 = fig.colorbar(cnt2,ticks=[0.0, AE_max_2],ax=axs[1,0])
-    cbar2.set_ticklabels([r'$0$', fmt(AE_max_2,1)])
-    cbar3 = fig.colorbar(cnt3,ticks=[0.0, AE_max_3],ax=axs[1,1])
-    cbar3.set_ticklabels([r'$0$', fmt(AE_max_3,1)])
 
-    cbar1.set_label(r'$\widehat{A}$')
-    cbar3.set_label(r'$\widehat{A}$')
-    # cbar.set_label(r'$\widehat{A}$')
+    # set colorbar
+    cbar0 = fig.colorbar(cnt0,ticks=[AE_min, AE_max],ax=axs.ravel().tolist())
+    # cbar1 = fig.colorbar(cnt1,ticks=[AE_min, AE_max],ax=axs[0,1])
+    # cbar2 = fig.colorbar(cnt2,ticks=[AE_min, AE_max],ax=axs[1,0])
+    # cbar3 = fig.colorbar(cnt3,ticks=[AE_min, AE_max],ax=axs[1,1])
+
+    # set colorbar ticks
+    cbar0.set_ticklabels([fmt(AE_min,1), fmt(AE_max,1)])
+    # cbar1.set_ticklabels([fmt(AE_min,1), fmt(AE_max,1)])
+    # cbar2.set_ticklabels([fmt(AE_min,1), fmt(AE_max,1)])
+    # cbar3.set_ticklabels([fmt(AE_min,1), fmt(AE_max,1)])
+
+    # set label, only for rightmost colorbar
+    cbar0.set_label(r'$\log_{10}\widehat{A}$')
+    # cbar1.set_label(r'$\log_{10}\widehat{A}$')
+    # cbar3.set_label(r'$\log_{10}\widehat{A}$')
+
+    # set edgecolor to facecolor
     cbar0.solids.set_edgecolor("face")
-    cbar1.solids.set_edgecolor("face")
-    cbar2.solids.set_edgecolor("face")
-    cbar3.solids.set_edgecolor("face")
-    # plt.title(r'Available Energy as a function of $s$ and $\alpha$' '\n' r'$\omega_n$={}, $\eta$={}, $\epsilon$={}, $q$={}, $d R_0/ d r$={}, $\kappa$={}, $s_\kappa$={}, $\delta$={}, $s_\delta$={}' '\n'.format(omn,eta,epsilon,q,dR0dr,kappa,s_kappa,delta,s_delta))
+    # cbar1.solids.set_edgecolor("face")
+    # cbar2.solids.set_edgecolor("face")
+    # cbar3.solids.set_edgecolor("face")
+    
+    # set labels
     axs[0,0].set_xlabel(r'$\alpha$')
     axs[1,0].set_xlabel(r'$\alpha$')
     axs[0,1].set_xlabel(r'$\alpha$')
@@ -142,10 +158,14 @@ if __name__ == "__main__":
     axs[1,0].set_ylabel(r'$s$')
     axs[0,1].set_ylabel(r'$s$')
     axs[1,1].set_ylabel(r'$s$')
-    axs[0,0].text(1.7, -1.5, r'$(a)$',c='white')
-    axs[0,1].text(1.7, -1.5, r'$(b)$',c='white')
-    axs[1,0].text(1.7, -1.5, r'$(c)$',c='white')
-    axs[1,1].text(1.7, -1.5, r'$(d)$',c='white')
+
+    # set plot names
+    axs[0,0].text(1.7, -0.5, r'$(a)$',c='white')
+    axs[0,1].text(1.7, -0.5, r'$(b)$',c='white')
+    axs[1,0].text(1.7, -0.5, r'$(c)$',c='white')
+    axs[1,1].text(1.7, -0.5, r'$(d)$',c='white')
+
+    # set ticks
     axs[0,0].xaxis.set_tick_params(which='major', direction='in', top='on')
     axs[0,0].xaxis.set_tick_params(which='minor', direction='in', top='on')
     axs[0,0].yaxis.set_tick_params(which='major', direction='in', top='on')
@@ -163,15 +183,18 @@ if __name__ == "__main__":
     axs[1,1].yaxis.set_tick_params(which='major', direction='in', top='on')
     axs[1,1].yaxis.set_tick_params(which='minor', direction='in', top='on')
 
-
+    # set ticklabels
     axs[0,0].set_xticklabels([])
     axs[0,1].set_xticklabels([])
     axs[1,1].set_yticklabels([])
     axs[0,1].set_yticklabels([])
-    # plt.subplots_adjust(left=0.0, right=1.0, top=1.0, bottom=0.0)
-    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/s-alpha/s-alpha_paper.eps', format='eps',
+
+    # save figure
+    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/s-alpha/s-alpha_paper.png', format='png',
                 #This is recommendation for publication plots
                 dpi=1000,
                 # Plot will be occupy a maximum of available space
                 bbox_inches='tight')
+    
+    # show figure
     plt.show()

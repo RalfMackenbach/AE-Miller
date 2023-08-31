@@ -16,14 +16,16 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 #rc('font',**{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)
 
+save   = False
+
 omn     = 1.0
-eta     = 0.0
-epsilon = 1/3
-q       = 3.0
-dR0dr   =-0.5
+eta     = 1.0
+epsilon = 1/2
+q       = 1.0
+dR0dr   = 0.0
 s_kappa = 0.0
 s_delta = 0.0
-theta_res   = int(1e3+1)
+theta_res   = int(1e4+1)
 L_ref       = 'major'
 A = 3.0
 rho = 1.0
@@ -34,8 +36,8 @@ alpha_max = 1.0
 kappa_min = 0.5
 kappa_max = 2.0
 delta_min =-0.5
-delta_max = 0.5
-res = 100
+delta_max =+0.5
+res = 10
 
 s_grid          =   np.linspace(s_min, s_max, num=res, dtype='float64')
 alpha_grid      =   np.linspace(alpha_min, alpha_max, num=res, dtype='float64')
@@ -46,14 +48,14 @@ AE_opt          =   np.empty_like(sv)
 
 
 
-def fmt(x, pos):
-    a, b = '{:.1e}'.format(x).split('e')
-    b = int(b)
-    return r'${} \cdot 10^{{{}}}$'.format(a, b)
+def fmt(x, pos=1):
+    x = np.round(x,pos)
+    return r'${}$'.format(x)
 
-def opt_func(s_q,alpha):
+def opt_func(s_q,alpha,idx):
     fun = lambda x: AEtok.calc_AE(omn,eta,epsilon,  q,x[0], x[1],dR0dr, s_q,s_kappa,s_delta,alpha,theta_res,L_ref,A,rho)
     res = scipy.optimize.shgo(fun,bounds=((kappa_min,kappa_max),(delta_min,delta_max)),options={'disp': False} )
+    print(idx)
     return res
 
 if __name__ == "__main__":
@@ -63,7 +65,7 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AE_list = pool.starmap(opt_func, [(sv[idx],alphav[idx]) for idx, val in np.ndenumerate(sv)])
+    AE_list = pool.starmap(opt_func, [(sv[idx],alphav[idx],idx) for idx, val in np.ndenumerate(sv)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
     pool.close()
 
@@ -80,24 +82,27 @@ if __name__ == "__main__":
         list_idx = list_idx+1
 
     # save the data to hdf5 
-    f = h5py.File('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/optimisation/optimized-tokamak-par.h5', 'w')
-    f.create_dataset('AE_opt', data=AE_opt)
-    f.create_dataset('kappa_opt', data=kappa_opt)
-    f.create_dataset('delta_opt', data=delta_opt)
-    f.create_dataset('sv', data=sv)
-    f.create_dataset('alphav', data=alphav)
-    f.close()
+    if save==True:
+        f = h5py.File('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/optimisation/optimized-tokamak-par.h5', 'w')
+        f.create_dataset('AE_opt', data=AE_opt)
+        f.create_dataset('kappa_opt', data=kappa_opt)
+        f.create_dataset('delta_opt', data=delta_opt)
+        f.create_dataset('sv', data=sv)
+        f.create_dataset('alphav', data=alphav)
+        f.close()
 
     fig, axs = plt.subplots(1,4, figsize=(6.850394, 5.0/2.5)) #figsize=(6.850394, 3.0)
     pAE         = axs[0].pcolor(alphav,sv,AE_opt,cmap='plasma')
     pAE.set_edgecolor('face')
-    cbarae   = fig.colorbar(pAE, ticks=[np.amin(AE_opt),np.amax(AE_opt)], ax=axs[0],orientation="horizontal",pad=0.3,label=r'$\widehat{A}$')
-    cbarae.set_ticks(ticks=[np.amin(AE_opt),np.amax(AE_opt)])
-    cbarae.set_ticklabels([fmt(np.amin(AE_opt),1),fmt(np.amax(AE_opt),1)])
-    pkappa      = axs[1].pcolor(alphav,sv,kappa_opt,cmap='viridis')
+    cbarae   = fig.colorbar(pAE, ticks=[0.0,np.amax(AE_opt)], ax=axs[0],orientation="horizontal",pad=0.3,label=r'$\widehat{A}$')
+    cbarae.set_ticks(ticks=[0,np.amax(AE_opt)])
+    cbarae.set_ticklabels([r'$0$',fmt(np.amax(AE_opt),1)])
+    pkappa      = axs[1].pcolor(alphav,sv,kappa_opt,cmap='viridis',vmin=kappa_min,vmax=kappa_max)
     pkappa.set_edgecolor('face')
     cbarkappa   = fig.colorbar(pkappa, ticks=[kappa_min,kappa_max], ax=axs[1],orientation="horizontal",pad=0.3,label=r'$\kappa$')
-    pdelta      = axs[2].pcolor(alphav,sv,delta_opt,cmap='viridis')
+    cbarkappa.set_ticks(ticks=[kappa_min,kappa_max])
+    cbarkappa.set_ticklabels([fmt(np.amax(kappa_min),1),fmt(np.amax(kappa_max),1)])
+    pdelta      = axs[2].pcolor(alphav,sv,delta_opt,cmap='viridis',vmin=delta_min,vmax=delta_max)
     pdelta.set_edgecolor('face')
     cbardelta   = fig.colorbar(pdelta, ticks=[delta_min,delta_max], ax=axs[2],orientation="horizontal",pad=0.3,label=r'$\delta$')
     from matplotlib.ticker import MaxNLocator
@@ -132,7 +137,7 @@ if __name__ == "__main__":
     axs[2].text(0.8,-0.5,r'$(c)$')
     axs[3].text(0.8,-0.5,r'$(d)$')
     plt.tight_layout()
-    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/optimisation/optimized-triptych.eps', format='eps',
+    plt.savefig('/Users/ralfmackenbach/Documents/GitHub/AE-tok/plots/Miller_plots/optimisation/optimized-salpha.png', format='png',
                 #This is recommendation for publication plots
                 dpi=1000,
                 # Plot will be occupy a maximum of available space
