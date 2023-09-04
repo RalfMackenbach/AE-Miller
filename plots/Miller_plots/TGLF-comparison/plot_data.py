@@ -5,6 +5,7 @@ import numpy as np
 import json 
 import numpy.ma as ma
 import matplotlib.colors as colors
+import AEtok.AE_tokamak_calculation as AEtok
 plt.close('all')
 
 mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
@@ -180,10 +181,10 @@ TGLF1.set_edgecolor('face')
 TGLF2.set_edgecolor('face')
 TGLF3.set_edgecolor('face')
 
-# make colorbars at top of the plot, label Q_{\rm TGLF}
-cbarTGLF1 = fig.colorbar(TGLF1,ax=axs[0,0],orientation='horizontal',label=r'$\log_{10} \widehat{Q}_{\rm TGLF}$',location='top')
-cbarTGLF2 = fig.colorbar(TGLF2,ax=axs[0,1],orientation='horizontal',label=r'$\log_{10} \widehat{Q}_{\rm TGLF}$',location='top')
-cbarTGLF3 = fig.colorbar(TGLF3,ax=axs[0,2],orientation='horizontal',label=r'$\log_{10} \widehat{Q}_{\rm TGLF}$',location='top')
+# make colorbars at top of the plot, label Q_e
+cbarTGLF1 = fig.colorbar(TGLF1,ax=axs[0,0],orientation='horizontal',label=r'$\log_{10} \widehat{Q}_e$',location='top')
+cbarTGLF2 = fig.colorbar(TGLF2,ax=axs[0,1],orientation='horizontal',label=r'$\log_{10} \widehat{Q}_e$',location='top')
+cbarTGLF3 = fig.colorbar(TGLF3,ax=axs[0,2],orientation='horizontal',label=r'$\log_{10} \widehat{Q}_e$',location='top')
 
 # set labels
 axs[0,0].set_ylabel(r'$\delta$')
@@ -228,7 +229,7 @@ plt.savefig('Qe_QAE_TGLF.png',dpi=1000)
 plt.show()
 plt.close()
 
-# now make a scatter plot of Q_{\rm TGLF} vs Q_{A}
+# now make a scatter plot of Q_e vs Q_{A}
 plt.figure(figsize=(6.850394/2, 6.850394/3),constrained_layout=True)
 
 plt.grid()
@@ -236,16 +237,62 @@ alpha_val = 0.2
 s_val = 10
 plt.scatter(QAE1,Qe1_masked,marker='.',color='k',alpha=alpha_val,s=s_val)
 plt.scatter(QAE2,Qe2_masked,marker='.',color='k',alpha=alpha_val,s=s_val)
-plt.scatter(np.transpose(QAE3),Qe3_masked,marker='.',color='k',alpha=alpha_val,s=s_val)
+plt.scatter(np.transpose(QAE3),Qe3_masked,marker='.',color='k',alpha=alpha_val,s=s_val,label=r'$\textsc{tglf}$')
 
-x_arr = np.linspace(0.5e1,2.0e3,100)
+# add scatter from PRL as well
+A_prl = [0.02359672, 0.08649891, 0.15689829, 0.2280691, 0.00594162, 0.01342324, 0.02091065, 0.02839889, 0.00343596, 0.00734704, 0.01126644, 0.01518755, 0.0105219, 0.01319848, 0.19905833] 
+Q_prl = [7.64584715, 37.11184344, 66.28563923, 88.89918002, 0.22148522, 0.82119839, 1.84836458, 8.27240125, 0.42191751, 0.31121588, 0.99697732, 5.04261588, 0.92047609, 0.61495549, 17.52584946]
+
+# convert to numpy arrays
+A_prl = np.asarray(A_prl)
+Q_prl = np.asarray(Q_prl)
+
+# convert A_prl to Q_A
+Q_Aprl = C * A_prl**(3/2)
+
+# plot
+plt.scatter(Q_Aprl,Q_prl,marker='.',color='tab:blue',s=2*s_val,label=r'$\textsc{gene}$')
+
+
+# add reviewer's data 
+Q_Rev = [23.46,12.26]
+
+# make Miller inputs of reviewer's data
+omn = 7.8 
+eta = 0
+eps = 0.2
+q = 2.01
+kappa =1.37
+delta = 0.16
+drR0 = -0.23
+sq = 1.59
+skappa = 0.20
+sdelta = 0.33
+alpha  =0.17
+# calculate AE
+AE_rev_1 = AEtok.calc_AE(omn,eta,eps,q,kappa,delta,drR0,sq,skappa,sdelta,alpha,L_ref='major')
+AE_rev_2 = AEtok.calc_AE(omn,eta,eps,q,kappa,-delta,drR0,sq,skappa,sdelta,alpha,L_ref='major')
+# convert to Q_A
+Q_A_rev_1 = C * AE_rev_1**(3/2)
+Q_A_rev_2 = C * AE_rev_2**(3/2)
+
+# plot
+plt.scatter(Q_A_rev_1,Q_Rev[0],marker='.',color='tab:orange',s=2*s_val,label=r'Rev. I')
+plt.scatter(Q_A_rev_2,Q_Rev[1],marker='.',color='tab:orange',s=2*s_val)
+
+
+# add legend
+plt.legend()
+
+
+x_arr = np.linspace(1e-1,1e4,100)
 y_arr = x_arr
 plt.plot(x_arr,y_arr,color='red',linestyle='--')
 plt.xlabel(r'$\widehat{Q}_{A}$')
-plt.ylabel(r'$\widehat{Q}_{\rm TGLF}$')
+plt.ylabel(r'$\widehat{Q}_e$')
 plt.xscale('log')
 plt.yscale('log')
 # save figure
-print('N =',N)
+print('N =',N + len(Q_Aprl))
 plt.savefig('Qe_QAE_TGLF_scatter.png',dpi=1000)
 plt.show()
