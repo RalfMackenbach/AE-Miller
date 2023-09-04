@@ -8,6 +8,7 @@ from    scipy.special           import  erf, ellipe, ellipk
 from    scipy.integrate         import  quad
 
 
+
 def AE_per_lam(c0,c1,tau_b,wlam):
     r"""
     function containing the integral over z for exactly omnigenous systems.
@@ -57,7 +58,7 @@ def all_drifts(f,h0,h1,x):
 
 
 
-def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res=1001,L_ref='major',A=3.0,rho=1.0,int_meth='quad',lam_res=1000,plot_precs=False):
+def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_res=1001,L_ref='major',A=3.0,rho=1.0,int_meth='quad',lam_res=1000,plot_precs=False,plot_dist=False,Cr_model='r_eff',output='AE'):
     """
     ``calc_AE`` calculates the AE of a Miller tokamak.
     Takes as input the following set of parameters
@@ -103,6 +104,7 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
     MC   = Mf.MC(epsilon, q, kappa, delta, dR0dr, s_q, s_kappa, s_delta, alpha)
     eps  = MC.epsilon
     xi   = MC.xi
+    
     #############################################################################
     #
     #
@@ -121,6 +123,7 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
     bps         = Mf.bps(theta_arr,MC)
     Rs          = Mf.R_s(theta_arr,MC)
     l_theta     = Mf.ltheta(theta_arr,MC)
+
     
     if int_meth=='trapz':
         lam_arr     = np.delete(np.linspace(1/np.amax(b_arr),1/np.amin(b_arr),lam_res+1,endpoint=False),0)
@@ -128,6 +131,7 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
         ae_list     = []
         oml_list    = []
         root_list   = []
+        tau_list    = []
 
         for idx, lam_val in enumerate(lam_arr):
             averaging_arr   = ( 2. * ( 1. - lam_val*b_arr ) * ( rdbdrho - rdbpdrho - 1./Rc ) - lam_val * b_arr * rdbdrho ) / ( MC.epsilon * bps * Rs )
@@ -146,6 +150,7 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
             AE_arr[idx]     = np.sum(int_z)
             oml_list.append(list(oml))
             root_list.append(list(roots))
+            tau_list.append(list(g_hat_eps))
 
         fluxtube_vol = MC.xi_2 / MC.xi
 
@@ -154,12 +159,16 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
         if plot_precs==True:
             plot_precession(oml_list,root_list,theta_arr,b_arr,lam_arr,ae_list)
 
+        # plot integrand
+        if plot_dist==True:
+            plot_integrand(oml_list,tau_list,lam_arr,omn,eta,b_arr)
+
     if int_meth=='quad':
         def quad_int(lam_val):
             averaging_arr   = ( 2. * ( 1. - lam_val*b_arr ) * ( rdbdrho - rdbpdrho - 1./Rc ) - lam_val * b_arr * rdbdrho ) / ( MC.epsilon * bps * Rs )
-            dldtheta        =  l_theta * b_arr / bps
+            dldtheta        = l_theta * b_arr / bps
             f_arr_numer     = averaging_arr * dldtheta
-            f_arr_denom     = l_theta * b_arr/ bps
+            f_arr_denom     = dldtheta
             f               = 1 - lam_val * b_arr
             ave,roots       = all_drifts(f,f_arr_denom,f_arr_numer,theta_arr)
             den,num         = ave[0], ave[1]
@@ -177,8 +186,21 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
 
         fluxtube_vol = MC.xi_2 / MC.xi
 
-    # I now use the Ansatz C_r = 1.0 instead of q.
-    return prefac * np.sqrt(epsilon) * int_res / fluxtube_vol * 3/16
+    # set C_r model
+    if Cr_model=='r_miller':
+        Cr = 1.0
+    if Cr_model=='r_eff':
+        Cr = 1.0/np.sqrt(MC.psi_tor)
+
+    AE = Cr**2 * prefac * np.sqrt(epsilon) * int_res / fluxtube_vol * 1/8
+
+    if output=='AE':
+        return AE
+    
+    if output=='Qe':
+        # PRL constant of proportionality
+        C = 1072.6914449397775
+        return C * AE**(3/2)
     
     
 
@@ -229,37 +251,6 @@ def plot_precession(walpha,roots,theta,b_arr,lam_arr,ae_per_lam):
             walpha_bounceplot.extend([walpha_at_lam[idx]])
 
     roots_ordered, walpha_bounceplot = (list(t) for t in zip(*sorted(zip(roots_bounceplot, walpha_bounceplot))))
-    # ax[0].plot(theta,b_arr,color='black')
-    # ax001= ax[0].twinx()
-    # ax001.plot(roots_ordered,walpha_bounceplot,color='tab:blue')
-    # ax001.plot(np.asarray(roots_ordered),0.0*np.asarray(walpha_bounceplot),color='tab:red',linestyle='dashed')
-    # ax[0].set_xlim(theta.min(),theta.max())
-    # ax[0].set_xlabel(r'$\theta$')
-    # ax[0].set_ylabel(r'$B$')
-    # ax001.set_ylabel(r'$\omega_\lambda$',color='tab:blue')
-    # plt.savefig('prec.eps', format='eps',
-    #             #This is recommendation for publication plots
-    #             dpi=1000,
-    #             # Plot will be occupy a maximum of available space
-    #             bbox_inches='tight')
-    # plt.show()
-
-
-
-    # import matplotlib.pyplot as plt
-    # import matplotlib        as mpl
-    # from    matplotlib   import cm
-    # import  matplotlib.colors   as      mplc
-    # plt.close('all')
-
-    # font = {'family': 'sans-serif',
-    #         'weight': 'normal',
-    #         'size': 10}
-
-    # mpl.rc('font', **font)
-    # c = 0.5
-    # fig ,ax = plt.subplots()
-    # fig.set_size_inches(5/6*6, 5/6*3.5)
 
     lam_arr   = np.asarray(lam_arr).flatten()
     ae_per_lam = ae_per_lam
@@ -299,12 +290,100 @@ def plot_precession(walpha,roots,theta,b_arr,lam_arr,ae_per_lam):
     plt.subplots_adjust(left=0.1, right=0.88, top=0.99, bottom=0.08)
     cbar = plt.colorbar(cm.ScalarMappable(norm=mplc.Normalize(vmin=0.0, vmax=max_ae_per_lam, clip=False), cmap=cm.plasma), ticks=[0, max_ae_per_lam], ax=ax[1],location='bottom',label=r'$\widehat{A}_\lambda/\widehat{A}_{\lambda,\mathrm{max}}$') #'%.3f'
     cbar.ax.set_xticklabels([0, 1])
-    plt.savefig('ae_per_lam.eps', format='eps',
+    plt.savefig('ae_per_lam.png', format='png',
                 #This is recommendation for publication plots
                 dpi=1000,
                 # Plot will be occupy a maximum of available space
                 bbox_inches='tight')
     plt.show()
+
+
+
+
+
+def plot_integrand(wlam,tau_b,lam_arr,omn,eta,b_arr):
+    r"""
+    Plots the precession as a function of the bounce-points and k2.
+    """
+    import matplotlib.pyplot as plt
+    import matplotlib        as mpl
+    from matplotlib.colors import LogNorm
+    plt.close('all')
+
+    font = {'family': 'sans-serif',
+            'weight': 'normal',
+            'size': 10}
+
+    mpl.rc('font', **font)
+
+    # first construct the integrand function   
+    def integrand(wlam,tau_b,omn,eta,z):
+        omega_drift = omn * (1 + eta * (z - 3/2))
+        ramp_fun = np.heaviside(omega_drift/(z*wlam) - 1, 0) *  (omega_drift/(z*wlam) - 1)
+        return ramp_fun * np.exp(-z) * z**(5/2) * wlam**2 # * tau_b
+    
+    # now construct the integrand array
+    z = np.logspace(-2,2,1000)
+    integrand_arr = np.zeros((len(lam_arr),len(z)))
+    # loop over all values of lambda
+    for idx_lam, lam in enumerate(lam_arr):
+        # loop over all values of z
+        for idx_z, z_val in enumerate(z):
+            integrand_arr[idx_lam,idx_z] = np.sum(integrand(np.asarray(wlam[idx_lam]),np.asarray(tau_b[idx_lam]),omn,eta,z_val))
+
+    # do integral over z
+    integrand_arr_lam = np.trapz(integrand_arr,z,axis=1)
+
+    # make two plot: one showing the full integrand, and one showing the integral over z
+    fig, ax = plt.subplots(1,2,sharey=True,gridspec_kw={'width_ratios': [2.5, 1]})
+    fig.set_size_inches(5/6*6, 5/6*3.5)
+    ax[0].set_xscale('log')
+
+    # find minimal value of b_arr
+    b_min = b_arr.min()
+
+    # make contour of integrand
+    cmap = 'gist_heat_r'
+    log = False
+    lam_plot = np.arcsin(lam_arr*b_min)
+    # convert to degrees
+    lam_plot = lam_plot * 180/np.pi
+    if log==True:
+        # make levels logarithmic
+        levels = np.logspace(np.log10(integrand_arr.max()/1000),np.log10(integrand_arr.max()),100)
+        cnt = ax[0].contourf(z,lam_plot,integrand_arr,levels=levels,cmap=cmap,norm = LogNorm())
+    else:
+        cnt = ax[0].contourf(z,lam_plot,integrand_arr,cmap=cmap,levels=100)
+    ax[0].set_xlabel(r'$z=\epsilon/T_0$')
+    ax[0].set_ylabel(r'$\theta_{\rm pitch}$')
+    ax[0].set_title(r'$\int \epsilon (f_i - f_g) \mathrm{d}\psi \mathrm{d}\alpha \Big/ \int \mathrm{d}\psi \mathrm{d}\alpha $')
+    ax[0].set_ylim(lam_plot.min(),lam_plot.max())
+    ax[0].set_xlim(z.min(),z.max())
+
+    # add colorbar, extend bottom
+    # cbar = fig.colorbar(cnt, ax=ax[0],location='bottom')
+
+    # make line plot of integral over z
+    ax[1].plot(integrand_arr_lam,lam_plot,color='red')
+    # have small buffer on left and right
+    dif = integrand_arr_lam.max() - integrand_arr_lam.min()
+    ax[1].set_xlim(0.0,integrand_arr_lam.max() + 0.05*dif)
+    ax[1].set_ylim(lam_plot.min(),lam_plot.max())
+    # remove right spline 
+    ax[1].spines['right'].set_visible(False)
+
+
+
+    # show plot
+    plt.tight_layout()
+    plt.show()
+
+
+
+
+    
+
+
 
 
 
@@ -324,7 +403,7 @@ def CHM(k2,s,alpha,q):
 
 
 
-def calc_AE_salpha(omn,eta,epsilon,q,s_q,alpha,L_ref='major',A=3.0,rho=1.0,int_meth='quad',lam_res=1000):
+def calc_AE_salpha(omn,eta,epsilon,q,s_q,alpha,L_ref='major',A=3.0,rho=1.0,int_meth='quad',lam_res=1000,output='AE'):
     '''
     ``calc_AE`` calculates the AE of a Miller tokamak.
     Takes as input the following set of parameters
@@ -374,5 +453,14 @@ def calc_AE_salpha(omn,eta,epsilon,q,s_q,alpha,L_ref='major',A=3.0,rho=1.0,int_m
             return ae_per_lam
         int_res, err = quad(quad_int,0,1,epsrel=1e-4)
 
-    return prefac * 2 * np.sqrt(2)/np.pi * np.sqrt(epsilon) * int_res  * 3/16
+    # create AE
+    AE = prefac * 2 * np.sqrt(2)/np.pi * np.sqrt(epsilon) * int_res  * 1/8
+
+    if output=='AE':
+        return AE
+
+    if output=='Qe':
+        # PRL constant of proportionality
+        C = 1072.6914449397775
+        return C * AE**(3/2)
     
