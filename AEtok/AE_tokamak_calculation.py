@@ -90,6 +90,16 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
         plot_precs: Boolean. If set to True, one plots the AE per lambda.
                     Can be useful for debugging and physics insights. Needs
                     'trapz' for int_meth.
+        plot_dist:  Boolean. If set to True, one plots the energy density.
+                    Can be useful for debugging and physics insights. Needs
+                    'trapz' for int_meth.
+        Cr_model:   String. Either 'r_miller' or 'r_eff'. If 'r_miller', the
+                    C_r constant is set to 1. If 'r_eff', the C_r constant is
+                    set to 1/sqrt(psi_tor), where psi_tor is the toroidal flux
+                    at the flux surface.
+        output:     String. Either 'AE' or 'Qe'. If 'AE', the function returns
+                    the available energy. If 'Qe', the function returns the
+                    electron heat flux as calculated from fit.
     """
 
     # Do conversions between minor and major here
@@ -427,6 +437,9 @@ def calc_AE_salpha(omn,eta,epsilon,q,s_q,alpha,L_ref='major',A=3.0,rho=1.0,int_m
                     via lam_res. If one wants to plot AE per lambda, trapz needs to
                     be used.
         lam_res:    lambda resolution for trapezoidal integral over lambda.
+        output:     String. Either 'AE' or 'Qe'. If 'AE', the function returns
+                    the available energy. If 'Qe', the function returns the
+                    electron heat flux as calculated from fit.
     '''
     prefac = 1.0
     if L_ref=='minor':
