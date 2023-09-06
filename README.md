@@ -44,6 +44,6 @@ Besides the plasma and geometric parameters, we highlight several important para
 
 `Cr_model` sets the model for the correlation length. The r_eff model result in the best correlation with nonlinear heat-fluxes, so this is set as the standard. 
 
-`output` can either be AE or Qe. The latter returns the heat-flux according to the scaling of PRL (2022 Mackenbach).
+`output` can either be AE or Qe. The latter returns the heat-flux according to the scaling of PRL (2022 Mackenbach), applicable for `L_ref='minor'`.
 
 `theta_res` is the number of grid-points in theta used to generate the profiles, `lam_res` (only used if `int_meth='trapz'`) sets the resolution of the trapezoidal integral over pitch angle.
