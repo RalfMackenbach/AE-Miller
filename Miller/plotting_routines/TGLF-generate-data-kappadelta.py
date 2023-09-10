@@ -7,7 +7,7 @@ import h5py
 import matplotlib        as mpl
 
 
-omn     = "scan"
+omn     = 2.0
 eta     = 1.0
 q       = 2.0
 s_q     = 0.0
@@ -49,8 +49,8 @@ if __name__ == "__main__":
 
     # time the full integral
     start_time = time.time()
-    AEkd_list =   pool.starmap(AEtok.calc_AE, [(2.0,eta,None,q,kappav[idx],deltav[idx],dR0dr,s_q,  s_kappa,s_delta,alpha,theta_res,L_ref,Aspect_ratio,rho) for idx, _ in np.ndenumerate(AEv_kd)])
-    AEkd_list_2 = pool.starmap(AEtok.calc_AE, [(4.0,eta,None,q,kappav[idx],deltav[idx],dR0dr,s_q,  s_kappa,s_delta,alpha,theta_res,L_ref,Aspect_ratio,rho) for idx, _ in np.ndenumerate(AEv_kd)])
+    AEkd_list =   pool.starmap(AEtok.calc_AE, [(omn,eta,None,q,kappav[idx],deltav[idx],dR0dr,s_q,  s_kappa,s_delta,alpha,theta_res,L_ref,Aspect_ratio,rho) for idx, _ in np.ndenumerate(AEv_kd)])
+    AEkd_list_2 = pool.starmap(AEtok.calc_AE, [(4.0,eta,None,q,kappav[idx],deltav[idx],dR0dr,1.0,  s_kappa,s_delta,alpha,theta_res,L_ref,Aspect_ratio,rho) for idx, _ in np.ndenumerate(AEv_kd)])
     print("data generated in       --- %s seconds ---" % (time.time() - start_time))
 
     pool.close()

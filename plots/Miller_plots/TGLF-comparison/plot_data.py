@@ -8,6 +8,10 @@ import matplotlib.colors as colors
 import AEtok.AE_tokamak_calculation as AEtok
 plt.close('all')
 
+
+add_rev = False
+
+
 mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 ## for Palatino and other serif fonts use:
 #rc('font',**{'family':'serif','serif':['Palatino']})
@@ -18,7 +22,7 @@ C = 1072.6914449397775
 
 # open TGLF data
 f1 = open("data/tglf_ae_delta-kappa_DELTA_LOC_KAPPA_LOC_20x20_SAT=2_NBASIS=6_KYMAX=1_UNITS=GENE_epsilon=0.33_rmin=0.5_omn=2.0_eta=1.0_q=2.json")
-f2 = open("data/tglf_ae_delta-kappa_DELTA_LOC_KAPPA_LOC_20x20_SAT=2_NBASIS=6_KYMAX=1_UNITS=GENE_epsilon=0.33_rmin=0.5_omn=4.0_eta=1.0_q=2.json")
+f2 = open("data/tglf_ae_delta-kappa_DELTA_LOC_KAPPA_LOC_20x20_SAT=2_NBASIS=6_KYMAX=1_UNITS=GENE_epsilon=0.33_rmin=0.5_omn=4.0_eta=1.0_q=2_shat=1.json")
 f3 = open("data/tglf_ae_s-alpha_Q_PRIME_LOC_P_PRIME_LOC_20x20_SAT=2_NBASIS=6_KYMAX=1_UNITS=GENE_epsilon=0.33_rmin=0.5_omn=4.0_eta=1.0_q=2.json")
 
 # now load the data
@@ -254,44 +258,87 @@ Q_Aprl = C * A_prl**(3/2)
 plt.scatter(Q_Aprl,Q_prl,marker='.',color='tab:blue',s=2*s_val,label=r'$\textsc{gene}$')
 
 
-# add reviewer's data 
-Q_Rev = [23.46,12.26]
+if add_rev:
+    # add reviewer's data 
+    Q_Rev = [23.46,12.26]
 
-# make Miller inputs of reviewer's data
-omn = 7.8 
-eta = 0
-eps = 0.2
-q = 2.01
-kappa =1.37
-delta = 0.16
-drR0 = -0.23
-sq = 1.59
-skappa = 0.20
-sdelta = 0.33
-alpha  =0.17
-# calculate AE
-AE_rev_1 = AEtok.calc_AE(omn,eta,eps,q,kappa,delta,drR0,sq,skappa,sdelta,alpha,L_ref='major')
-AE_rev_2 = AEtok.calc_AE(omn,eta,eps,q,kappa,-delta,drR0,sq,skappa,sdelta,alpha,L_ref='major')
-# convert to Q_A
-Q_A_rev_1 = C * AE_rev_1**(3/2)
-Q_A_rev_2 = C * AE_rev_2**(3/2)
+    # make Miller inputs of reviewer's data
+    omn = 7.8 
+    eta = 0
+    eps = 0.2
+    q = 2.01
+    kappa =1.37
+    delta = 0.16
+    drR0 = -0.23
+    sq = 1.59
+    skappa = 0.20
+    sdelta = 0.33
+    alpha  =0.17
+    # calculate AE
+    AE_rev_1 = AEtok.calc_AE(omn,eta,eps,q,kappa,delta,drR0,sq,skappa,sdelta,alpha,L_ref='major')
+    AE_rev_2 = AEtok.calc_AE(omn,eta,eps,q,kappa,-delta,drR0,sq,skappa,sdelta,alpha,L_ref='major')
+    # convert to Q_A
+    Q_A_rev_1 = C * AE_rev_1**(3/2)
+    Q_A_rev_2 = C * AE_rev_2**(3/2)
 
-# plot
-plt.scatter(Q_A_rev_1,Q_Rev[0],marker='.',color='tab:orange',s=2*s_val,label=r'Rev. I')
-plt.scatter(Q_A_rev_2,Q_Rev[1],marker='.',color='tab:orange',s=2*s_val)
+    # plot
+    plt.scatter(Q_A_rev_1,Q_Rev[0],marker='.',color='tab:orange',s=2*s_val,label=r'Rev. I')
+    plt.scatter(Q_A_rev_2,Q_Rev[1],marker='.',color='tab:orange',s=2*s_val)
+
 
 
 # add legend
 plt.legend()
 
+# fit line to log data
+# first make arrays of log data
+log_QAE1 = np.log10(QAE1)
+log_QAE2 = np.log10(QAE2)
+log_QAE3 = np.log10(np.transpose(QAE3))
+log_QAEprl = np.log10(Q_Aprl)
+log_Qe1  = np.log10(Qe1)
+log_Qe2  = np.log10(Qe2)
+log_Qe3  = np.log10(Qe3)
+log_Qeprl = np.log10(Q_prl)
 
-x_arr = np.linspace(1e-1,1e4,100)
+# combine data into flat arrays
+log_QAE = np.concatenate((log_QAE1.flatten(),log_QAE2.flatten(),log_QAE3.flatten(),log_QAEprl.flatten()))
+log_Qe  = np.concatenate((log_Qe1.flatten(),log_Qe2.flatten(),log_Qe3.flatten(),log_Qeprl.flatten()))
+
+# show data
+#plt.scatter(10**log_QAE,10**log_Qe,marker='.',color='tab:green',s=2*s_val,label=r'$\textsc{ae-tok}$')
+
+# fit power law of form y = b * x
+# we use log-log data, so we fit a line to log data as log(y) = log(x) + log(b)
+# so we fit a line to log data
+def fit_func(x,b):
+    return x + b
+
+# # fit line to log data
+# from scipy.optimize import curve_fit
+# popt, pcov = curve_fit(fit_func, log_QAE, log_Qe)
+# b = popt[0]
+# b_err = np.sqrt(pcov[0,0])
+# print('b = ', b, 'b_err = ', b_err)
+
+# # plot fit bounds  
+# x = np.logspace(-1,4,100)
+# y = 10**(b+b_err) * x
+# plt.plot(x,y,color='tab:red',linestyle='--')
+
+# y = 10**(b-b_err) * x
+# plt.plot(x,y,color='tab:red',linestyle='--')
+
+
+x_arr = np.logspace(-1,4,100)
 y_arr = x_arr
 plt.plot(x_arr,y_arr,color='red',linestyle='--')
 plt.xlabel(r'$\widehat{Q}_{A}$')
 plt.ylabel(r'$\widehat{Q}_e$')
 plt.xscale('log')
 plt.yscale('log')
+plt.xlim([0.1,10000])
+plt.ylim([0.1,10000])
 # save figure
 print('N =',N + len(Q_Aprl))
 plt.savefig('Qe_QAE_TGLF_scatter.png',dpi=1000)

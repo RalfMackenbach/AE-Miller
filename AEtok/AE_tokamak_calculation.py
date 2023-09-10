@@ -208,7 +208,7 @@ def calc_AE(omn,eta,epsilon,q,kappa,delta,dR0dr,s_q,s_kappa,s_delta,alpha,theta_
         return AE
     
     if output=='Qe':
-        # PRL constant of proportionality
+        # PRL constant of proportionality, for 'minor' reference
         C = 1072.6914449397775
         return C * AE**(3/2)
     
@@ -473,7 +473,7 @@ def calc_AE_salpha(omn,eta,epsilon,q,s_q,alpha,L_ref='major',A=3.0,rho=1.0,int_m
         return AE
 
     if output=='Qe':
-        # PRL constant of proportionality
+        # PRL constant of proportionality, for 'minor' reference
         C = 1072.6914449397775
         return C * AE**(3/2)
     
