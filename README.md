@@ -38,7 +38,7 @@ Documentation on the input parameters are provided as docstrings.
 #### Important input parameters
 Besides the plasma and geometric parameters, we highlight several important parameters.
 
-`L_ref` sets which length-scale is used as reference length. For major, the major radius will be used and `omn = - R0/r d ln(n)/dr`. For minor, the minor radius will be used and `omn = - a/r d ln(n)/dr`. Furthermore, the expansion parameter rho* is adjusted for minor to `rho_* = rho_gyro / a`. One needs to explicitely set the aspect ratio `A` and the normalized flux-surface radius `rho = r / a` when running with `L_ref = 'minor'`.
+`L_ref` sets which length-scale is used as reference length. For major, the major radius will be used and `omn = - R0/n dn/dr`. For minor, the minor radius will be used and `omn = - a/n dn/dr`. Furthermore, the expansion parameter rho* is adjusted for minor to `rho_* = rho_gyro / a`. One needs to explicitely set the aspect ratio `A` and the normalized flux-surface radius `rho = r / a` when running with `L_ref = 'minor'`.
 
 `int_meth` sets the method by which the integral over pitch angle is performed. `quad` performs best in almost all cases, so it is recommended to run with this setting. However, if one wishes to investigate the Æ per bounce-well (`plot_precs=True` or `plot_dist=True`), one needs to run the code with `int_meth='trapz'`.
 
